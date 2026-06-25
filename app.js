@@ -1,4 +1,5 @@
 const STORAGE_KEY = "archivethread-uae-designs";
+const BULK_STORAGE_KEY = "archivethread-uae-bulk-discounts";
 const AED = new Intl.NumberFormat("en-AE", {
   style: "currency",
   currency: "AED",
@@ -12,6 +13,12 @@ const methodPresets = {
 };
 
 const MIN_SELLING_PRICE = 250;
+const defaultBulkDiscounts = [
+  { minQty: 1, maxQty: 24, discountPercent: 0 },
+  { minQty: 25, maxQty: 49, discountPercent: 3 },
+  { minQty: 50, maxQty: 99, discountPercent: 6 },
+  { minQty: 100, maxQty: 999999, discountPercent: 10 }
+];
 
 const seedDesigns = [
   {
@@ -128,8 +135,10 @@ const marginOutput = document.querySelector("#marginOutput");
 const toast = document.querySelector("#toast");
 
 let designs = loadDesigns();
+let bulkDiscounts = loadBulkDiscounts();
 let activeId = designs[0]?.id || null;
 let currentMockupImage = designs[0]?.mockupImage || "";
+let activeView = "single";
 
 function loadDesigns() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -145,6 +154,22 @@ function loadDesigns() {
 
 function persistDesigns() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(designs));
+}
+
+function loadBulkDiscounts() {
+  const saved = localStorage.getItem(BULK_STORAGE_KEY);
+  if (!saved) return defaultBulkDiscounts;
+
+  try {
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) && parsed.length ? parsed : defaultBulkDiscounts;
+  } catch {
+    return defaultBulkDiscounts;
+  }
+}
+
+function persistBulkDiscounts() {
+  localStorage.setItem(BULK_STORAGE_KEY, JSON.stringify(bulkDiscounts));
 }
 
 function numericValue(id) {
@@ -168,6 +193,11 @@ function getOverheadTotal(design) {
     designNumber(design, "overheadLabelsTags") +
     designNumber(design, "overheadOther")
   );
+}
+
+function getBulkDiscount(quantity) {
+  const tier = bulkDiscounts.find((item) => quantity >= item.minQty && quantity <= item.maxQty);
+  return tier ? designNumber(tier, "discountPercent") : 0;
 }
 
 function getFormData() {
@@ -219,18 +249,22 @@ function calculate(design) {
     designNumber(design, "laborCost");
   const productionCost = variableUnitCost * quantity + designNumber(design, "setupFee") + overheadTotal;
   const unitCost = productionCost / quantity;
+  const bulkDiscount = getBulkDiscount(quantity);
+  const discountedUnitCost = unitCost * (1 - bulkDiscount / 100);
   const targetMargin = Math.min(designNumber(design, "margin"), 95) / 100;
-  const preVatPrice = unitCost / (1 - targetMargin);
+  const preVatPrice = discountedUnitCost / (1 - targetMargin);
   const calculatedShelfPrice = design.vatEnabled ? preVatPrice * 1.05 : preVatPrice;
   const sellingPrice = Math.max(MIN_SELLING_PRICE, calculatedShelfPrice);
   const revenueExVat = design.vatEnabled ? sellingPrice / 1.05 : sellingPrice;
-  const grossProfit = revenueExVat - unitCost;
+  const grossProfit = revenueExVat - discountedUnitCost;
   const actualMargin = revenueExVat ? (grossProfit / revenueExVat) * 100 : 0;
 
   return {
     variableUnitCost,
     productionCost,
     unitCost,
+    discountedUnitCost,
+    bulkDiscount,
     overheadTotal,
     overheadPerShirt,
     preVatPrice,
@@ -305,6 +339,8 @@ function updateUI() {
   document.querySelector("#quantity").value = design.quantity;
   document.querySelector("#overhead").value = result.overheadPerShirt.toFixed(2);
   document.querySelector("#overheadTotal").textContent = `${AED.format(result.overheadTotal)} total`;
+  document.querySelector("#bulkDiscount").textContent = `${result.bulkDiscount}%`;
+  document.querySelector("#activeBulkDiscount").textContent = `${result.bulkDiscount}% active`;
   document.querySelector("#editingStatus").textContent = activeId ? "Editing saved design" : "New design";
   document.querySelector("#shirtPreview").style.setProperty("--print-color", methodColor);
   mockupPreview.src = design.mockupImage || "";
@@ -319,7 +355,25 @@ function updateUI() {
   document.querySelector("#actualMargin").textContent = `${Math.round(result.actualMargin)}%`;
 
   renderBreakdown(result);
+  renderBulkDiscounts();
   renderLibrary();
+  renderCompareRows();
+  updateView();
+}
+
+function renderBulkDiscounts() {
+  document.querySelector("#bulkDiscountRows").innerHTML = bulkDiscounts
+    .map((tier, index) => {
+      const label = tier.maxQty >= 999999 ? `${tier.minQty}+ units` : `${tier.minQty}-${tier.maxQty} units`;
+      return `
+        <label class="bulk-row">
+          <span>${label}</span>
+          <input type="number" min="0" max="50" step="0.5" value="${tier.discountPercent}" data-index="${index}" aria-label="Discount for ${label}" />
+          <strong>%</strong>
+        </label>
+      `;
+    })
+    .join("");
 }
 
 function renderBreakdown(result) {
@@ -382,6 +436,38 @@ function renderLibraryItem(design) {
   `;
 }
 
+function renderCompareRows() {
+  const rows = designs.map((design) => {
+    const normalized = normalizeDesign(design);
+    const result = calculate(normalized);
+    return `
+      <tr>
+        <td>
+          <strong>${normalized.designName}</strong>
+          <span>${normalized.colorway}</span>
+        </td>
+        <td>${normalized.method}<br /><span>${normalized.ageGroup} / ${normalized.gender}</span></td>
+        <td>${normalized.quantity}<br /><span>S ${normalized.sizeS} &middot; M ${normalized.sizeM} &middot; L ${normalized.sizeL}</span></td>
+        <td>${AED.format(result.unitCost)}</td>
+        <td>${result.bulkDiscount}%</td>
+        <td><strong>${AED.format(result.sellingPrice)}</strong></td>
+        <td>${Math.round(result.actualMargin)}%</td>
+      </tr>
+    `;
+  });
+
+  document.querySelector("#compareRows").innerHTML = rows.length
+    ? rows.join("")
+    : `<tr><td colspan="7">No saved designs yet.</td></tr>`;
+}
+
+function updateView() {
+  document.querySelector("#singleView").classList.toggle("hidden", activeView !== "single");
+  document.querySelector("#compareView").classList.toggle("hidden", activeView !== "compare");
+  document.querySelector("#singleViewButton").classList.toggle("active", activeView === "single");
+  document.querySelector("#compareViewButton").classList.toggle("active", activeView === "compare");
+}
+
 function escapeExcelCell(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -419,6 +505,8 @@ function exportDesignsToExcel() {
       "Overhead Per Shirt AED": result.overheadPerShirt.toFixed(2),
       "Total Production Cost AED": result.productionCost.toFixed(2),
       "Cost Per Shirt AED": result.unitCost.toFixed(2),
+      "Bulk Discount %": result.bulkDiscount,
+      "Discounted Cost Per Shirt AED": result.discountedUnitCost.toFixed(2),
       "Desired Margin %": design.margin,
       "Actual Margin %": result.actualMargin.toFixed(2),
       "VAT Included": design.vatEnabled ? "Yes" : "No",
@@ -449,6 +537,90 @@ function exportDesignsToExcel() {
   link.remove();
   URL.revokeObjectURL(url);
   showToast("Excel file exported.");
+}
+
+function exportCurrentDesignToPdf() {
+  const design = getFormData();
+  const result = calculate(design);
+  const sizeRows = [
+    ["S", design.sizeS],
+    ["M", design.sizeM],
+    ["L", design.sizeL]
+  ];
+  const breakdownRows = result.breakdown
+    .map(([label, value]) => `<tr><td>${escapeExcelCell(label)}</td><td>${AED.format(value)}</td></tr>`)
+    .join("");
+  const html = `
+    <!doctype html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>${escapeExcelCell(design.designName)} Quote</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 0; padding: 32px; color: #17211d; }
+          h1 { margin: 0; font-size: 30px; }
+          h2 { margin-top: 28px; font-size: 18px; border-bottom: 2px solid #dfe4df; padding-bottom: 8px; }
+          .brand { display: flex; align-items: center; gap: 14px; border-bottom: 4px solid #0f6b4a; padding-bottom: 18px; }
+          .mark { width: 48px; height: 48px; display: grid; place-items: center; background: #1e2421; color: white; font-weight: 800; border-radius: 8px; }
+          .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+          .box { background: #f6f7f4; border: 1px solid #dfe4df; border-radius: 8px; padding: 12px; }
+          .label { color: #68716d; font-size: 12px; text-transform: uppercase; }
+          .value { margin-top: 4px; font-weight: 700; }
+          table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+          th, td { padding: 10px; border-bottom: 1px solid #dfe4df; text-align: left; }
+          th { background: #f3f6f2; }
+          .summary { background: #1e2421; color: white; border-radius: 8px; padding: 18px; margin-top: 18px; }
+          .summary strong { color: #f4c466; font-size: 28px; display: block; margin-top: 6px; }
+          .footer { margin-top: 32px; color: #68716d; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <div class="brand">
+          <div class="mark">AT</div>
+          <div>
+            <h1>ArchiveThread UAE</h1>
+            <div>Premium Souvenir T-Shirt Quote</div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="box"><div class="label">Design</div><div class="value">${escapeExcelCell(design.designName)}</div></div>
+          <div class="box"><div class="label">Colorway</div><div class="value">${escapeExcelCell(design.colorway)}</div></div>
+          <div class="box"><div class="label">Printing</div><div class="value">${design.method}</div></div>
+          <div class="box"><div class="label">Specs</div><div class="value">${design.ageGroup} / ${design.gender}</div></div>
+        </div>
+
+        <h2>Size Breakdown</h2>
+        <table>
+          <thead><tr><th>Size</th><th>Quantity</th></tr></thead>
+          <tbody>${sizeRows.map(([size, qty]) => `<tr><td>${size}</td><td>${qty}</td></tr>`).join("")}<tr><th>Total</th><th>${design.quantity}</th></tr></tbody>
+        </table>
+
+        <h2>Cost Breakdown</h2>
+        <table>
+          <thead><tr><th>Item</th><th>Total AED</th></tr></thead>
+          <tbody>${breakdownRows}<tr><th>Total production cost</th><th>${AED.format(result.productionCost)}</th></tr></tbody>
+        </table>
+
+        <div class="summary">
+          <div>Suggested selling price</div>
+          <strong>${AED.format(result.sellingPrice)}</strong>
+          <p>Cost per shirt: ${AED.format(result.unitCost)} &middot; Bulk discount: ${result.bulkDiscount}% &middot; Gross profit per shirt: ${AED.format(result.grossProfit)} &middot; Margin: ${Math.round(result.actualMargin)}%</p>
+        </div>
+
+        <div class="footer">Generated ${new Date().toLocaleString()} for ArchiveThread UAE.</div>
+      </body>
+    </html>
+  `;
+  const printWindow = window.open("", "", "width=1000,height=800");
+  if (!printWindow) {
+    showToast("Allow popups to export PDF.");
+    return;
+  }
+  printWindow.document.write(html);
+  printWindow.document.close();
+  printWindow.focus();
+  printWindow.print();
 }
 
 function saveCurrentDesign() {
@@ -519,6 +691,27 @@ document.querySelector("#newDesignButton").addEventListener("click", () => {
 document.querySelector("#duplicateButton").addEventListener("click", () => duplicateDesign());
 
 document.querySelector("#exportExcelButton").addEventListener("click", exportDesignsToExcel);
+document.querySelector("#exportPdfButton").addEventListener("click", exportCurrentDesignToPdf);
+
+document.querySelector("#singleViewButton").addEventListener("click", () => {
+  activeView = "single";
+  updateView();
+});
+
+document.querySelector("#compareViewButton").addEventListener("click", () => {
+  activeView = "compare";
+  renderCompareRows();
+  updateView();
+});
+
+document.querySelector("#bulkDiscountRows").addEventListener("input", (event) => {
+  const input = event.target.closest("input[data-index]");
+  if (!input) return;
+  const index = Number(input.dataset.index);
+  bulkDiscounts[index].discountPercent = Math.max(0, Math.min(50, Number(input.value) || 0));
+  persistBulkDiscounts();
+  updateUI();
+});
 
 document.querySelector("#mockupUpload").addEventListener("change", (event) => {
   const file = event.target.files?.[0];

@@ -41,6 +41,10 @@
             <p>Estimate AED costs for premium UAE archive-quality DTF, DTG, and Silk Screen production.</p>
           </div>
           <div class="topbar-actions">
+            <button class="ghost-button" id="exportPdfButton" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /><path d="M9 14h6M9 18h4" /></svg>
+              Export PDF
+            </button>
             <button class="ghost-button" id="exportExcelButton" type="button">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 3v4a2 2 0 0 0 2 2h4" /><path d="M5 3h9l6 6v12H5z" /><path d="M8 13h8M8 17h8" /></svg>
               Export Excel
@@ -52,7 +56,12 @@
           </div>
         </header>
 
-        <section class="content-grid">
+        <div class="view-toggle" aria-label="Calculator view">
+          <button class="active" id="singleViewButton" type="button">Single Design</button>
+          <button id="compareViewButton" type="button">Compare Designs</button>
+        </div>
+
+        <section class="content-grid" id="singleView">
           <form class="calculator-panel" id="calculatorForm">
             <div class="section-heading">
               <div>
@@ -186,6 +195,17 @@
               </div>
             </div>
 
+            <div class="subsection-panel">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3>Bulk pricing discounts</h3>
+                  <p>Discounts are applied to cost per shirt before margin and VAT.</p>
+                </div>
+                <strong id="activeBulkDiscount">0% active</strong>
+              </div>
+              <div class="bulk-grid" id="bulkDiscountRows"></div>
+            </div>
+
             <div class="option-row">
               <label class="toggle">
                 <input id="vatEnabled" name="vatEnabled" type="checkbox" checked />
@@ -223,6 +243,10 @@
 
             <div class="metric-grid">
               <div>
+                <span>Bulk discount</span>
+                <strong id="bulkDiscount">0%</strong>
+              </div>
+              <div>
                 <span>Total production cost</span>
                 <strong id="totalCost">AED 0.00</strong>
               </div>
@@ -245,6 +269,31 @@
               <div id="breakdownRows"></div>
             </div>
           </aside>
+        </section>
+
+        <section class="compare-panel hidden" id="compareView" aria-label="Compare saved shirt designs">
+          <div class="section-heading">
+            <div>
+              <h2>Compare saved designs</h2>
+              <p>Review production cost, bulk discount, margin, and suggested price across your library.</p>
+            </div>
+          </div>
+          <div class="compare-table-wrap">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th>Design</th>
+                  <th>Specs</th>
+                  <th>Qty</th>
+                  <th>Cost / shirt</th>
+                  <th>Discount</th>
+                  <th>Selling price</th>
+                  <th>Margin</th>
+                </tr>
+              </thead>
+              <tbody id="compareRows"></tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>
