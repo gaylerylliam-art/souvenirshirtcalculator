@@ -7,9 +7,9 @@ const AED = new Intl.NumberFormat("en-AE", {
 });
 
 const methodPresets = {
-  DTF: { printCost: 35, setupFee: 85, color: "#0f6b4a" },
-  DTG: { printCost: 35, setupFee: 55, color: "#9b1c31" },
-  "Silk Screen": { printCost: 35, setupFee: 220, color: "#171717" }
+  DTF: { printCost: 35, setupFee: 85, color: "#2563eb" },
+  DTG: { printCost: 35, setupFee: 55, color: "#1e40af" },
+  "Silk Screen": { printCost: 35, setupFee: 220, color: "#0f172a" }
 };
 
 const MIN_SELLING_PRICE = 250;
@@ -34,6 +34,18 @@ const seedDesigns = [
     sizeSCost: 25,
     sizeMCost: 28,
     sizeLCost: 31,
+    sizeSPrint: 10,
+    sizeMPrint: 12,
+    sizeLPrint: 14,
+    sizeSPackaging: 1.5,
+    sizeMPackaging: 2,
+    sizeLPackaging: 2.5,
+    sizeSLabel: 0.5,
+    sizeMLabel: 0.5,
+    sizeLLabel: 0.5,
+    sizeSLabor: 1.5,
+    sizeMLabor: 2,
+    sizeLLabor: 2.5,
     quantity: 50,
     blankCost: 28,
     printCost: 35,
@@ -63,6 +75,18 @@ const seedDesigns = [
     sizeSCost: 25,
     sizeMCost: 28,
     sizeLCost: 31,
+    sizeSPrint: 10,
+    sizeMPrint: 12,
+    sizeLPrint: 14,
+    sizeSPackaging: 1.5,
+    sizeMPackaging: 2,
+    sizeLPackaging: 2.5,
+    sizeSLabel: 0.5,
+    sizeMLabel: 0.5,
+    sizeLLabel: 0.5,
+    sizeSLabor: 1.5,
+    sizeMLabor: 2,
+    sizeLLabor: 2.5,
     quantity: 35,
     blankCost: 28,
     printCost: 35,
@@ -92,6 +116,18 @@ const seedDesigns = [
     sizeSCost: 22,
     sizeMCost: 25,
     sizeLCost: 28,
+    sizeSPrint: 10,
+    sizeMPrint: 12,
+    sizeLPrint: 14,
+    sizeSPackaging: 1.5,
+    sizeMPackaging: 2,
+    sizeLPackaging: 2.5,
+    sizeSLabel: 0.5,
+    sizeMLabel: 0.5,
+    sizeLLabel: 0.5,
+    sizeSLabor: 1.5,
+    sizeMLabor: 2,
+    sizeLLabor: 2.5,
     quantity: 120,
     blankCost: 25.17,
     printCost: 35,
@@ -122,6 +158,18 @@ const fields = [
   "sizeSCost",
   "sizeMCost",
   "sizeLCost",
+  "sizeSPrint",
+  "sizeMPrint",
+  "sizeLPrint",
+  "sizeSPackaging",
+  "sizeMPackaging",
+  "sizeLPackaging",
+  "sizeSLabel",
+  "sizeMLabel",
+  "sizeLLabel",
+  "sizeSLabor",
+  "sizeMLabor",
+  "sizeLLabor",
   "quantity",
   "blankCost",
   "printCost",
@@ -200,14 +248,38 @@ function getSizeQuantityFromInputs() {
 
 function getSizeRows(design) {
   return [
-    { size: "S", quantity: designNumber(design, "sizeS"), cost: designNumber(design, "sizeSCost", designNumber(design, "blankCost")) },
-    { size: "M", quantity: designNumber(design, "sizeM"), cost: designNumber(design, "sizeMCost", designNumber(design, "blankCost")) },
-    { size: "L", quantity: designNumber(design, "sizeL"), cost: designNumber(design, "sizeLCost", designNumber(design, "blankCost")) }
+    buildSizeRow(design, "S"),
+    buildSizeRow(design, "M"),
+    buildSizeRow(design, "L")
   ];
 }
 
-function getBlankCostTotal(design) {
-  return getSizeRows(design).reduce((sum, row) => sum + row.quantity * row.cost, 0);
+function buildSizeRow(design, size) {
+  const prefix = `size${size}`;
+  const fallbackBlank = designNumber(design, "blankCost");
+  const fallbackPrint = designNumber(design, "printCost");
+  const fallbackPackaging = designNumber(design, "packaging");
+  const fallbackLabel = designNumber(design, "labelCost");
+  const fallbackLabor = designNumber(design, "laborCost");
+  const quantity = designNumber(design, prefix);
+  const blank = designNumber(design, `${prefix}Cost`, fallbackBlank);
+  const print = designNumber(design, `${prefix}Print`, fallbackPrint);
+  const packaging = designNumber(design, `${prefix}Packaging`, fallbackPackaging);
+  const label = designNumber(design, `${prefix}Label`, fallbackLabel);
+  const labor = designNumber(design, `${prefix}Labor`, fallbackLabor);
+  const unitCost = blank + print + packaging + label + labor;
+
+  return { size, quantity, blank, print, packaging, label, labor, unitCost, total: unitCost * quantity };
+}
+
+function getWeightedAverage(design, key) {
+  const rows = getSizeRows(design);
+  const quantity = rows.reduce((sum, row) => sum + row.quantity, 0) || 1;
+  return rows.reduce((sum, row) => sum + row.quantity * row[key], 0) / quantity;
+}
+
+function getSizeCostTotal(design, key = "total") {
+  return getSizeRows(design).reduce((sum, row) => sum + row[key] * (key === "total" ? 1 : row.quantity), 0);
 }
 
 function getOverheadTotal(design) {
@@ -232,10 +304,25 @@ function getFormData() {
     sizeL: Math.max(0, Math.round(numericValue("sizeL"))),
     sizeSCost: numericValue("sizeSCost"),
     sizeMCost: numericValue("sizeMCost"),
-    sizeLCost: numericValue("sizeLCost")
+    sizeLCost: numericValue("sizeLCost"),
+    sizeSPrint: numericValue("sizeSPrint"),
+    sizeMPrint: numericValue("sizeMPrint"),
+    sizeLPrint: numericValue("sizeLPrint"),
+    sizeSPackaging: numericValue("sizeSPackaging"),
+    sizeMPackaging: numericValue("sizeMPackaging"),
+    sizeLPackaging: numericValue("sizeLPackaging"),
+    sizeSLabel: numericValue("sizeSLabel"),
+    sizeMLabel: numericValue("sizeMLabel"),
+    sizeLLabel: numericValue("sizeLLabel"),
+    sizeSLabor: numericValue("sizeSLabor"),
+    sizeMLabor: numericValue("sizeMLabor"),
+    sizeLLabor: numericValue("sizeLLabor")
   };
-  const blankCostTotal = getBlankCostTotal(sizeData);
-  const averageBlankCost = blankCostTotal / quantity;
+  const averageBlankCost = getWeightedAverage(sizeData, "blank");
+  const averagePrintCost = getWeightedAverage(sizeData, "print");
+  const averagePackaging = getWeightedAverage(sizeData, "packaging");
+  const averageLabel = getWeightedAverage(sizeData, "label");
+  const averageLabor = getWeightedAverage(sizeData, "labor");
   const overheadTotal = getOverheadTotal({
     overheadLicense: numericValue("overheadLicense"),
     overheadDesignPermit: numericValue("overheadDesignPermit"),
@@ -253,11 +340,11 @@ function getFormData() {
     ...sizeData,
     quantity,
     blankCost: averageBlankCost,
-    printCost: numericValue("printCost"),
+    printCost: averagePrintCost,
     setupFee: numericValue("setupFee"),
-    packaging: numericValue("packaging"),
-    labelCost: numericValue("labelCost"),
-    laborCost: numericValue("laborCost"),
+    packaging: averagePackaging,
+    labelCost: averageLabel,
+    laborCost: averageLabor,
     overhead: overheadTotal / quantity,
     overheadLicense: numericValue("overheadLicense"),
     overheadDesignPermit: numericValue("overheadDesignPermit"),
@@ -271,17 +358,15 @@ function getFormData() {
 
 function calculate(design) {
   const quantity = Math.max(1, designNumber(design, "quantity", 1));
-  const blankCostTotal = getBlankCostTotal(design);
-  const averageBlankCost = blankCostTotal / quantity;
+  const sizeProductionTotal = getSizeCostTotal(design);
+  const averageBlankCost = getWeightedAverage(design, "blank");
+  const averagePrintCost = getWeightedAverage(design, "print");
+  const averagePackaging = getWeightedAverage(design, "packaging");
+  const averageLabel = getWeightedAverage(design, "label");
+  const averageLabor = getWeightedAverage(design, "labor");
   const overheadTotal = getOverheadTotal(design) || designNumber(design, "overhead") * quantity;
   const overheadPerShirt = overheadTotal / quantity;
-  const variableUnitCost =
-    averageBlankCost +
-    designNumber(design, "printCost") +
-    designNumber(design, "packaging") +
-    designNumber(design, "labelCost") +
-    designNumber(design, "laborCost");
-  const productionCost = variableUnitCost * quantity + designNumber(design, "setupFee") + overheadTotal;
+  const productionCost = sizeProductionTotal + designNumber(design, "setupFee") + overheadTotal;
   const unitCost = productionCost / quantity;
   const bulkDiscount = getBulkDiscount(quantity);
   const discountedUnitCost = unitCost * (1 - bulkDiscount / 100);
@@ -294,9 +379,10 @@ function calculate(design) {
   const actualMargin = revenueExVat ? (grossProfit / revenueExVat) * 100 : 0;
 
   return {
-    variableUnitCost,
+    variableUnitCost: sizeProductionTotal / quantity,
     productionCost,
     unitCost,
+    sizeProductionTotal,
     discountedUnitCost,
     bulkDiscount,
     overheadTotal,
@@ -307,12 +393,12 @@ function calculate(design) {
     grossProfit,
     actualMargin,
     breakdown: [
-      ["Blank shirts by size", blankCostTotal],
-      ["Printing", designNumber(design, "printCost") * quantity],
+      ["Blank shirts by size", averageBlankCost * quantity],
+      ["Printing by size", averagePrintCost * quantity],
       ["Setup", designNumber(design, "setupFee")],
-      ["Packaging", designNumber(design, "packaging") * quantity],
-      ["Label / tag", designNumber(design, "labelCost") * quantity],
-      ["Labor", designNumber(design, "laborCost") * quantity],
+      ["Packaging by size", averagePackaging * quantity],
+      ["Label / tag by size", averageLabel * quantity],
+      ["Labor by size", averageLabor * quantity],
       ["License / trade permit", designNumber(design, "overheadLicense")],
       ["Design permit / archive rights", designNumber(design, "overheadDesignPermit")],
       ["Label tags batch", designNumber(design, "overheadLabelsTags")],
@@ -347,7 +433,19 @@ function normalizeDesign(design) {
   const sizeSCost = designNumber(design, "sizeSCost", fallbackBlankCost);
   const sizeMCost = designNumber(design, "sizeMCost", fallbackBlankCost);
   const sizeLCost = designNumber(design, "sizeLCost", fallbackBlankCost);
-  const blankCostTotal = getBlankCostTotal({ sizeS, sizeM, sizeL, sizeSCost, sizeMCost, sizeLCost });
+  const sizeSPrint = designNumber(design, "sizeSPrint", designNumber(design, "printCost", 35));
+  const sizeMPrint = designNumber(design, "sizeMPrint", designNumber(design, "printCost", 35));
+  const sizeLPrint = designNumber(design, "sizeLPrint", designNumber(design, "printCost", 35));
+  const sizeSPackaging = designNumber(design, "sizeSPackaging", designNumber(design, "packaging", 0));
+  const sizeMPackaging = designNumber(design, "sizeMPackaging", designNumber(design, "packaging", 0));
+  const sizeLPackaging = designNumber(design, "sizeLPackaging", designNumber(design, "packaging", 0));
+  const sizeSLabel = designNumber(design, "sizeSLabel", designNumber(design, "labelCost", 0));
+  const sizeMLabel = designNumber(design, "sizeMLabel", designNumber(design, "labelCost", 0));
+  const sizeLLabel = designNumber(design, "sizeLLabel", designNumber(design, "labelCost", 0));
+  const sizeSLabor = designNumber(design, "sizeSLabor", designNumber(design, "laborCost", 0));
+  const sizeMLabor = designNumber(design, "sizeMLabor", designNumber(design, "laborCost", 0));
+  const sizeLLabor = designNumber(design, "sizeLLabor", designNumber(design, "laborCost", 0));
+  const normalizedSizeData = { sizeS, sizeM, sizeL, sizeSCost, sizeMCost, sizeLCost, sizeSPrint, sizeMPrint, sizeLPrint, sizeSPackaging, sizeMPackaging, sizeLPackaging, sizeSLabel, sizeMLabel, sizeLLabel, sizeSLabor, sizeMLabor, sizeLLabor };
   const overheadTotal =
     getOverheadTotal(design) || designNumber(design, "overhead") * Math.max(1, designNumber(design, "quantity", quantity));
 
@@ -362,8 +460,24 @@ function normalizeDesign(design) {
     sizeSCost,
     sizeMCost,
     sizeLCost,
+    sizeSPrint,
+    sizeMPrint,
+    sizeLPrint,
+    sizeSPackaging,
+    sizeMPackaging,
+    sizeLPackaging,
+    sizeSLabel,
+    sizeMLabel,
+    sizeLLabel,
+    sizeSLabor,
+    sizeMLabor,
+    sizeLLabor,
     quantity,
-    blankCost: blankCostTotal / quantity,
+    blankCost: getWeightedAverage(normalizedSizeData, "blank"),
+    printCost: getWeightedAverage(normalizedSizeData, "print"),
+    packaging: getWeightedAverage(normalizedSizeData, "packaging"),
+    labelCost: getWeightedAverage(normalizedSizeData, "label"),
+    laborCost: getWeightedAverage(normalizedSizeData, "labor"),
     overheadLicense: designNumber(design, "overheadLicense", overheadTotal),
     overheadDesignPermit: designNumber(design, "overheadDesignPermit", 0),
     overheadLabelsTags: designNumber(design, "overheadLabelsTags", 0),
@@ -375,15 +489,19 @@ function normalizeDesign(design) {
 function updateUI() {
   const design = getFormData();
   const result = calculate(design);
-  const methodColor = methodPresets[design.method]?.color || "#0f6b4a";
+  const methodColor = methodPresets[design.method]?.color || "#2563eb";
   const mockupPreview = document.querySelector("#mockupPreview");
 
   marginOutput.value = `${design.margin}%`;
   document.querySelector("#quantity").value = design.quantity;
-  document.querySelector("#blankCost").value = result.unitCost ? (getBlankCostTotal(design) / design.quantity).toFixed(2) : "0.00";
-  document.querySelector("#blankTotal").textContent = `${AED.format(getBlankCostTotal(design))} total`;
+  document.querySelector("#blankCost").value = getWeightedAverage(design, "blank").toFixed(2);
+  document.querySelector("#printCost").value = getWeightedAverage(design, "print").toFixed(2);
+  document.querySelector("#packaging").value = getWeightedAverage(design, "packaging").toFixed(2);
+  document.querySelector("#labelCost").value = getWeightedAverage(design, "label").toFixed(2);
+  document.querySelector("#laborCost").value = getWeightedAverage(design, "labor").toFixed(2);
+  document.querySelector("#blankTotal").textContent = `${AED.format(result.sizeProductionTotal)} total`;
   getSizeRows(design).forEach((row) => {
-    document.querySelector(`#size${row.size}Total`).textContent = AED.format(row.quantity * row.cost);
+    document.querySelector(`#size${row.size}Total`).textContent = AED.format(row.total);
   });
   document.querySelector("#overhead").value = result.overheadPerShirt.toFixed(2);
   document.querySelector("#overheadTotal").textContent = `${AED.format(result.overheadTotal)} total`;
@@ -391,6 +509,9 @@ function updateUI() {
   document.querySelector("#activeBulkDiscount").textContent = `${result.bulkDiscount}% active`;
   document.querySelector("#editingStatus").textContent = activeId ? "Editing saved design" : "New design";
   document.querySelector("#shirtPreview").style.setProperty("--print-color", methodColor);
+  document.querySelectorAll("[data-method-option]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.methodOption === design.method);
+  });
   mockupPreview.src = design.mockupImage || "";
   mockupPreview.hidden = !design.mockupImage;
   document.querySelector("#sellingPrice").textContent = AED.format(result.sellingPrice);
@@ -459,7 +580,7 @@ function renderLibrary() {
 function renderLibraryItem(design) {
   const result = calculate(design);
   const activeClass = design.id === activeId ? "active" : "";
-  const color = methodPresets[design.method]?.color || "#0f6b4a";
+  const color = methodPresets[design.method]?.color || "#2563eb";
   const thumb = design.mockupImage
     ? `<img class="mini-mockup" src="${design.mockupImage}" alt="" />`
     : `<span class="mini-shirt" style="--print-color:${color}"></span>`;
@@ -495,7 +616,7 @@ function renderCompareRows() {
           <span>${normalized.colorway}</span>
         </td>
         <td>${normalized.method}<br /><span>${normalized.ageGroup} / ${normalized.gender}</span></td>
-        <td>${normalized.quantity}<br /><span>S ${normalized.sizeS} @ ${AED.format(normalized.sizeSCost)} &middot; M ${normalized.sizeM} @ ${AED.format(normalized.sizeMCost)} &middot; L ${normalized.sizeL} @ ${AED.format(normalized.sizeLCost)}</span></td>
+        <td>${normalized.quantity}<br /><span>S ${normalized.sizeS} @ ${AED.format(buildSizeRow(normalized, "S").unitCost)} &middot; M ${normalized.sizeM} @ ${AED.format(buildSizeRow(normalized, "M").unitCost)} &middot; L ${normalized.sizeL} @ ${AED.format(buildSizeRow(normalized, "L").unitCost)}</span></td>
         <td>${AED.format(result.unitCost)}</td>
         <td>${result.bulkDiscount}%</td>
         <td><strong>${AED.format(result.sellingPrice)}</strong></td>
@@ -537,16 +658,31 @@ function exportDesignsToExcel() {
       "Printing Method": design.method,
       "Size S": design.sizeS,
       "Size S Blank Cost AED": design.sizeSCost,
-      "Size S Blank Total AED": (design.sizeS * design.sizeSCost).toFixed(2),
+      "Size S Print Cost AED": design.sizeSPrint,
+      "Size S Packaging AED": design.sizeSPackaging,
+      "Size S Label AED": design.sizeSLabel,
+      "Size S Labor AED": design.sizeSLabor,
+      "Size S Unit Cost AED": buildSizeRow(design, "S").unitCost.toFixed(2),
+      "Size S Total AED": buildSizeRow(design, "S").total.toFixed(2),
       "Size M": design.sizeM,
       "Size M Blank Cost AED": design.sizeMCost,
-      "Size M Blank Total AED": (design.sizeM * design.sizeMCost).toFixed(2),
+      "Size M Print Cost AED": design.sizeMPrint,
+      "Size M Packaging AED": design.sizeMPackaging,
+      "Size M Label AED": design.sizeMLabel,
+      "Size M Labor AED": design.sizeMLabor,
+      "Size M Unit Cost AED": buildSizeRow(design, "M").unitCost.toFixed(2),
+      "Size M Total AED": buildSizeRow(design, "M").total.toFixed(2),
       "Size L": design.sizeL,
       "Size L Blank Cost AED": design.sizeLCost,
-      "Size L Blank Total AED": (design.sizeL * design.sizeLCost).toFixed(2),
+      "Size L Print Cost AED": design.sizeLPrint,
+      "Size L Packaging AED": design.sizeLPackaging,
+      "Size L Label AED": design.sizeLLabel,
+      "Size L Labor AED": design.sizeLLabor,
+      "Size L Unit Cost AED": buildSizeRow(design, "L").unitCost.toFixed(2),
+      "Size L Total AED": buildSizeRow(design, "L").total.toFixed(2),
       "Total Quantity": design.quantity,
       "Average Blank Shirt Cost AED": design.blankCost.toFixed(2),
-      "Blank Shirt Total AED": getBlankCostTotal(design).toFixed(2),
+      "Size Production Total AED": result.sizeProductionTotal.toFixed(2),
       "Print Cost Per Shirt AED": design.printCost,
       "Setup Fee AED": design.setupFee,
       "Packaging Per Shirt AED": design.packaging,
@@ -598,9 +734,9 @@ function exportCurrentDesignToPdf() {
   const design = getFormData();
   const result = calculate(design);
   const sizeRows = [
-    ["S", design.sizeS, design.sizeSCost],
-    ["M", design.sizeM, design.sizeMCost],
-    ["L", design.sizeL, design.sizeLCost]
+    buildSizeRow(design, "S"),
+    buildSizeRow(design, "M"),
+    buildSizeRow(design, "L")
   ];
   const breakdownRows = result.breakdown
     .map(([label, value]) => `<tr><td>${escapeExcelCell(label)}</td><td>${AED.format(value)}</td></tr>`)
@@ -612,21 +748,21 @@ function exportCurrentDesignToPdf() {
         <meta charset="utf-8" />
         <title>${escapeExcelCell(design.designName)} Quote</title>
         <style>
-          body { font-family: Arial, sans-serif; margin: 0; padding: 32px; color: #17211d; }
+          body { font-family: Arial, sans-serif; margin: 0; padding: 32px; color: #0f172a; }
           h1 { margin: 0; font-size: 30px; }
-          h2 { margin-top: 28px; font-size: 18px; border-bottom: 2px solid #dfe4df; padding-bottom: 8px; }
-          .brand { display: flex; align-items: center; gap: 14px; border-bottom: 4px solid #0f6b4a; padding-bottom: 18px; }
-          .mark { width: 48px; height: 48px; display: grid; place-items: center; background: #1e2421; color: white; font-weight: 800; border-radius: 8px; }
+          h2 { margin-top: 28px; font-size: 18px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; }
+          .brand { display: flex; align-items: center; gap: 14px; border-bottom: 4px solid #2563eb; padding-bottom: 18px; }
+          .mark { width: 48px; height: 48px; display: grid; place-items: center; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; font-weight: 800; border-radius: 8px; }
           .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
-          .box { background: #f6f7f4; border: 1px solid #dfe4df; border-radius: 8px; padding: 12px; }
-          .label { color: #68716d; font-size: 12px; text-transform: uppercase; }
+          .box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; }
+          .label { color: #64748b; font-size: 12px; text-transform: uppercase; }
           .value { margin-top: 4px; font-weight: 700; }
           table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-          th, td { padding: 10px; border-bottom: 1px solid #dfe4df; text-align: left; }
-          th { background: #f3f6f2; }
-          .summary { background: #1e2421; color: white; border-radius: 8px; padding: 18px; margin-top: 18px; }
-          .summary strong { color: #f4c466; font-size: 28px; display: block; margin-top: 6px; }
-          .footer { margin-top: 32px; color: #68716d; font-size: 12px; }
+          th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+          th { background: #eff6ff; color: #0c4a6e; }
+          .summary { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #0c4a6e; border: 1px solid #bae6fd; border-radius: 8px; padding: 18px; margin-top: 18px; }
+          .summary strong { color: #0369a1; font-size: 28px; display: block; margin-top: 6px; }
+          .footer { margin-top: 32px; color: #64748b; font-size: 12px; }
         </style>
       </head>
       <body>
@@ -647,8 +783,8 @@ function exportCurrentDesignToPdf() {
 
         <h2>Size Breakdown</h2>
         <table>
-          <thead><tr><th>Size</th><th>Quantity</th><th>Blank cost / shirt</th><th>Line total</th></tr></thead>
-          <tbody>${sizeRows.map(([size, qty, cost]) => `<tr><td>${size}</td><td>${qty}</td><td>${AED.format(cost)}</td><td>${AED.format(qty * cost)}</td></tr>`).join("")}<tr><th>Total</th><th>${design.quantity}</th><th>Average ${AED.format(design.blankCost)}</th><th>${AED.format(getBlankCostTotal(design))}</th></tr></tbody>
+          <thead><tr><th>Size</th><th>Qty</th><th>Blank</th><th>Print</th><th>Pkg</th><th>Label</th><th>Labor</th><th>Total</th></tr></thead>
+          <tbody>${sizeRows.map((row) => `<tr><td>${row.size}</td><td>${row.quantity}</td><td>${AED.format(row.blank)}</td><td>${AED.format(row.print)}</td><td>${AED.format(row.packaging)}</td><td>${AED.format(row.label)}</td><td>${AED.format(row.labor)}</td><td>${AED.format(row.total)}</td></tr>`).join("")}<tr><th>Total</th><th>${design.quantity}</th><th colspan="5">Average cost ${AED.format(result.unitCost)} including shared costs</th><th>${AED.format(result.sizeProductionTotal)}</th></tr></tbody>
         </table>
 
         <h2>Cost Breakdown</h2>
@@ -730,10 +866,19 @@ form.addEventListener("submit", (event) => {
 
 document.querySelector("#applyPresetButton").addEventListener("click", () => {
   const preset = methodPresets[document.querySelector("#method").value];
-  document.querySelector("#printCost").value = preset.printCost;
+  ["S", "M", "L"].forEach((size) => {
+    document.querySelector(`#size${size}Print`).value = preset.printCost;
+  });
   document.querySelector("#setupFee").value = preset.setupFee;
   updateUI();
   showToast("Printing preset applied.");
+});
+
+document.querySelectorAll("[data-method-option]").forEach((button) => {
+  button.addEventListener("click", () => {
+    document.querySelector("#method").value = button.dataset.methodOption;
+    updateUI();
+  });
 });
 
 document.querySelector("#newDesignButton").addEventListener("click", () => {

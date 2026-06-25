@@ -106,9 +106,14 @@
                   <option value="Kids">Kids</option>
                 </select>
               </div>
-              <div>
-                <label for="method">Printing method</label>
-                <select id="method" name="method">
+              <div class="method-group">
+                <label>Printing method</label>
+                <div class="segmented-control">
+                  <button class="active" type="button" data-method-option="DTF">DTF</button>
+                  <button type="button" data-method-option="DTG">DTG</button>
+                  <button type="button" data-method-option="Silk Screen">Silk Screen</button>
+                </div>
+                <select id="method" name="method" class="sr-only">
                   <option value="DTF">DTF</option>
                   <option value="DTG">DTG</option>
                   <option value="Silk Screen">Silk Screen</option>
@@ -123,24 +128,24 @@
                 <input id="blankCost" name="blankCost" type="number" min="0" step="0.01" value="25" readonly />
               </div>
               <div>
-                <label for="printCost">Print cost per shirt</label>
-                <input id="printCost" name="printCost" type="number" min="0" step="0.01" value="35" />
+                <label for="printCost">Average print cost</label>
+                <input id="printCost" name="printCost" type="number" min="0" step="0.01" value="35" readonly />
               </div>
               <div>
                 <label for="setupFee">Print setup fee</label>
                 <input id="setupFee" name="setupFee" type="number" min="0" step="0.01" value="85" />
               </div>
               <div>
-                <label for="packaging">Packaging per shirt</label>
-                <input id="packaging" name="packaging" type="number" min="0" step="0.01" value="4.5" />
+                <label for="packaging">Average packaging</label>
+                <input id="packaging" name="packaging" type="number" min="0" step="0.01" value="4.5" readonly />
               </div>
               <div>
-                <label for="labelCost">Label / tag per shirt</label>
-                <input id="labelCost" name="labelCost" type="number" min="0" step="0.01" value="2.25" />
+                <label for="labelCost">Average label / tag</label>
+                <input id="labelCost" name="labelCost" type="number" min="0" step="0.01" value="2.25" readonly />
               </div>
               <div>
-                <label for="laborCost">Labor per shirt</label>
-                <input id="laborCost" name="laborCost" type="number" min="0" step="0.01" value="6" />
+                <label for="laborCost">Average labor</label>
+                <input id="laborCost" name="laborCost" type="number" min="0" step="0.01" value="6" readonly />
               </div>
               <div>
                 <label for="overhead">Computed overhead per shirt</label>
@@ -163,26 +168,40 @@
                 </div>
                 <strong id="blankTotal">AED 0.00 total</strong>
               </div>
-              <div class="size-cost-grid">
-                <div class="size-cost-head">Size</div>
-                <div class="size-cost-head">Quantity</div>
-                <div class="size-cost-head">Blank cost / shirt</div>
-                <div class="size-cost-head">Line total</div>
-
-                <div class="size-label">S</div>
-                <input id="sizeS" name="sizeS" type="number" min="0" value="15" aria-label="Size S quantity" />
-                <input id="sizeSCost" name="sizeSCost" type="number" min="0" step="0.01" value="25" aria-label="Size S blank cost" />
-                <output id="sizeSTotal">AED 0.00</output>
-
-                <div class="size-label">M</div>
-                <input id="sizeM" name="sizeM" type="number" min="0" value="20" aria-label="Size M quantity" />
-                <input id="sizeMCost" name="sizeMCost" type="number" min="0" step="0.01" value="28" aria-label="Size M blank cost" />
-                <output id="sizeMTotal">AED 0.00</output>
-
-                <div class="size-label">L</div>
-                <input id="sizeL" name="sizeL" type="number" min="0" value="15" aria-label="Size L quantity" />
-                <input id="sizeLCost" name="sizeLCost" type="number" min="0" step="0.01" value="31" aria-label="Size L blank cost" />
-                <output id="sizeLTotal">AED 0.00</output>
+              <div class="size-card-grid">
+                <article class="size-cost-card">
+                  <header><strong>Size S</strong><output id="sizeSTotal">AED 0.00</output></header>
+                  <div class="mini-grid">
+                    <label>Qty<input id="sizeS" name="sizeS" type="number" min="0" value="15" /></label>
+                    <label>Blank<input id="sizeSCost" name="sizeSCost" type="number" min="0" step="0.01" value="18" /></label>
+                    <label>Print<input id="sizeSPrint" name="sizeSPrint" type="number" min="0" step="0.01" value="10" /></label>
+                    <label>Packaging<input id="sizeSPackaging" name="sizeSPackaging" type="number" min="0" step="0.01" value="1.5" /></label>
+                    <label>Label<input id="sizeSLabel" name="sizeSLabel" type="number" min="0" step="0.01" value="0.5" /></label>
+                    <label>Labor<input id="sizeSLabor" name="sizeSLabor" type="number" min="0" step="0.01" value="1.5" /></label>
+                  </div>
+                </article>
+                <article class="size-cost-card">
+                  <header><strong>Size M</strong><output id="sizeMTotal">AED 0.00</output></header>
+                  <div class="mini-grid">
+                    <label>Qty<input id="sizeM" name="sizeM" type="number" min="0" value="20" /></label>
+                    <label>Blank<input id="sizeMCost" name="sizeMCost" type="number" min="0" step="0.01" value="22" /></label>
+                    <label>Print<input id="sizeMPrint" name="sizeMPrint" type="number" min="0" step="0.01" value="12" /></label>
+                    <label>Packaging<input id="sizeMPackaging" name="sizeMPackaging" type="number" min="0" step="0.01" value="2" /></label>
+                    <label>Label<input id="sizeMLabel" name="sizeMLabel" type="number" min="0" step="0.01" value="0.5" /></label>
+                    <label>Labor<input id="sizeMLabor" name="sizeMLabor" type="number" min="0" step="0.01" value="2" /></label>
+                  </div>
+                </article>
+                <article class="size-cost-card">
+                  <header><strong>Size L</strong><output id="sizeLTotal">AED 0.00</output></header>
+                  <div class="mini-grid">
+                    <label>Qty<input id="sizeL" name="sizeL" type="number" min="0" value="15" /></label>
+                    <label>Blank<input id="sizeLCost" name="sizeLCost" type="number" min="0" step="0.01" value="25" /></label>
+                    <label>Print<input id="sizeLPrint" name="sizeLPrint" type="number" min="0" step="0.01" value="14" /></label>
+                    <label>Packaging<input id="sizeLPackaging" name="sizeLPackaging" type="number" min="0" step="0.01" value="2.5" /></label>
+                    <label>Label<input id="sizeLLabel" name="sizeLLabel" type="number" min="0" step="0.01" value="0.5" /></label>
+                    <label>Labor<input id="sizeLLabor" name="sizeLLabor" type="number" min="0" step="0.01" value="2.5" /></label>
+                  </div>
+                </article>
               </div>
             </div>
 
