@@ -91,10 +91,10 @@ svg {
 
 .app-shell {
   display: grid;
-  grid-template-columns: 310px minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 16px;
   min-height: 100vh;
-  padding: 18px;
+  padding: 16px;
 }
 
 .library-panel,
@@ -123,8 +123,8 @@ svg {
 
 .library-panel {
   position: sticky;
-  top: 18px;
-  height: calc(100vh - 36px);
+  top: 16px;
+  height: calc(100vh - 32px);
   overflow: auto;
   color: var(--white-smoke);
   background:
@@ -136,7 +136,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 22px 18px;
+  padding: 20px 16px;
   border-bottom: 1px solid rgba(246, 244, 243, 0.18);
 }
 
@@ -164,8 +164,8 @@ svg {
 }
 
 .brand-name {
-  max-width: 180px;
-  font-size: 18px;
+  max-width: 150px;
+  font-size: 16px;
   font-weight: 900;
   line-height: 1;
   text-transform: uppercase;
@@ -176,14 +176,14 @@ svg {
   color: rgba(246, 244, 243, 0.68);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .library-tools {
   display: grid;
   gap: 10px;
-  padding: 18px;
+  padding: 16px;
   border-bottom: 1px solid rgba(246, 244, 243, 0.16);
 }
 
@@ -248,14 +248,14 @@ input[readonly] {
 .library-list {
   display: grid;
   gap: 10px;
-  padding: 12px;
+  padding: 12px 10px;
 }
 
 .library-item {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 8px;
-  align-items: center;
+  align-items: stretch;
   border-color: rgba(246, 244, 243, 0.13);
   background: rgba(246, 244, 243, 0.08);
   box-shadow: none;
@@ -288,6 +288,10 @@ input[readonly] {
   text-align: left;
 }
 
+.library-select > div {
+  min-width: 0;
+}
+
 .library-select strong,
 .library-select small {
   display: block;
@@ -297,14 +301,15 @@ input[readonly] {
 }
 
 .library-select strong {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 900;
+  line-height: 1.25;
 }
 
 .library-select small {
   margin-top: 3px;
   color: rgba(246, 244, 243, 0.72);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
 }
 
@@ -328,6 +333,7 @@ input[readonly] {
 }
 
 .library-actions {
+  justify-content: flex-end;
   gap: 4px;
 }
 
@@ -360,11 +366,13 @@ input[readonly] {
 }
 
 .topbar {
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
   gap: 24px;
-  min-height: 104px;
-  margin-bottom: 18px;
-  padding: 24px 26px;
+  min-height: auto;
+  margin-bottom: 16px;
+  padding: 22px 24px;
   background:
     linear-gradient(135deg, rgba(246, 244, 243, 0.88), rgba(246, 244, 243, 0.62)),
     rgba(246, 244, 243, 0.74);
@@ -372,9 +380,10 @@ input[readonly] {
 }
 
 .topbar h1 {
-  font-size: clamp(28px, 4vw, 40px);
+  max-width: 780px;
+  font-size: clamp(30px, 3.2vw, 46px);
   font-weight: 900;
-  line-height: 1;
+  line-height: 1.08;
   letter-spacing: 0;
   text-transform: uppercase;
 }
@@ -384,7 +393,8 @@ input[readonly] {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  max-width: 760px;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -398,7 +408,7 @@ input[readonly] {
 .view-toggle {
   display: inline-flex;
   gap: 4px;
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   padding: 6px;
   background: rgba(246, 244, 243, 0.58);
 }
@@ -410,11 +420,13 @@ input[readonly] {
   border-radius: 7px;
   background: transparent;
   color: var(--ink);
-  padding: 0 18px;
-  font-size: 12px;
+  padding: 0 14px;
+  font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.02em;
   text-transform: uppercase;
+  line-height: 1.15;
+  white-space: normal;
 }
 
 .view-toggle button.active,
@@ -426,8 +438,8 @@ input[readonly] {
 
 .content-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(410px, 0.9fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr);
+  gap: 16px;
   align-items: start;
 }
 
@@ -442,7 +454,7 @@ input[readonly] {
 
 .calculator-panel {
   display: grid;
-  gap: 18px;
+  gap: 16px;
 }
 
 .calculator-panel > .section-heading,
@@ -454,13 +466,13 @@ input[readonly] {
 .summary-panel,
 .compare-panel {
   margin: 0;
-  padding: 22px;
+  padding: 20px;
   background: rgba(246, 244, 243, 0.68);
 }
 
 .summary-panel {
   position: sticky;
-  top: 18px;
+  top: 16px;
   min-height: auto;
 }
 
@@ -475,7 +487,7 @@ input[readonly] {
   position: relative;
   padding-left: 12px;
   border-left: 4px solid var(--cornflower);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: 0.02em;
   line-height: 1.1;
@@ -504,7 +516,7 @@ input[readonly] {
 
 .preview-band {
   display: grid;
-  grid-template-columns: 118px 1fr 1fr 1fr;
+  grid-template-columns: 112px repeat(3, minmax(140px, 1fr));
   gap: 16px;
   align-items: end;
 }
@@ -597,28 +609,38 @@ label {
   border: 1px solid rgba(25, 25, 35, 0.1);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.5);
+  min-width: 0;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
   gap: 16px;
 }
 
 .compact-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
   margin-bottom: 16px;
 }
 
 .compact-heading strong {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 42px;
-  padding: 0 16px;
+  min-width: 132px;
+  max-width: 180px;
+  padding: 8px 14px;
   border-radius: var(--radius);
   background: rgba(236, 195, 11, 0.82);
   color: var(--ink);
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 900;
+  line-height: 1.15;
+  text-align: center;
   box-shadow: 0 14px 28px rgba(236, 195, 11, 0.2);
 }
 
@@ -630,7 +652,7 @@ label {
 
 .size-cost-card {
   position: relative;
-  padding: 16px 12px 0;
+  padding: 14px 12px 12px;
   border-color: rgba(255, 255, 255, 0.52);
   overflow: hidden;
 }
@@ -650,21 +672,27 @@ label {
 .size-cost-card header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 .size-cost-card header strong {
-  display: grid;
-  min-width: 52px;
-  height: 52px;
-  place-items: center;
+  display: inline-flex;
+  min-width: 54px;
+  max-width: 64px;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
   border-radius: var(--radius);
   background: var(--cornflower);
   color: #fff;
-  font-size: 24px;
+  padding: 8px 10px;
+  font-size: 15px;
   font-weight: 900;
+  line-height: 1.05;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .size-cost-card:nth-child(2) header strong {
@@ -677,32 +705,39 @@ label {
 }
 
 .size-cost-card output {
-  min-width: auto;
+  display: block;
+  min-width: 82px;
+  max-width: 116px;
   color: var(--ink);
-  font-size: 14px;
+  font-size: 11px;
   font-weight: 900;
+  line-height: 1.15;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .mini-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 7px;
 }
 
 .mini-grid label {
   display: grid;
-  grid-template-columns: 1fr 94px;
+  grid-template-columns: minmax(42px, 1fr) minmax(64px, 86px);
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   margin: 0;
-  min-height: 38px;
+  min-height: 34px;
   color: var(--ink);
-  font-size: 12px;
+  font-size: 10px;
+  font-weight: 800;
 }
 
 .mini-grid input {
-  min-height: 32px;
+  min-height: 30px;
   padding: 5px 8px;
+  font-size: 11px;
 }
 
 .overhead-grid {
@@ -938,8 +973,9 @@ output {
 .metric-grid strong {
   display: block;
   margin-top: 9px;
-  font-size: 22px;
+  font-size: clamp(19px, 2vw, 24px);
   font-weight: 900;
+  line-height: 1.12;
 }
 
 .breakdown {
@@ -1044,6 +1080,42 @@ output {
 .compare-table span {
   color: var(--muted);
   font-size: 12px;
+}
+
+@media (max-width: 1900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-panel {
+    position: static;
+  }
+
+  .metric-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 1500px) {
+  .size-card-grid {
+    grid-template-columns: repeat(3, minmax(190px, 1fr));
+  }
+
+  .compact-heading {
+    align-items: stretch;
+  }
+
+  .compact-heading strong {
+    min-width: 120px;
+  }
 }
 
 .toast {
