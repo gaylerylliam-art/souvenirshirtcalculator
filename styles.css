@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap");
 
 :root {
   --shadow-grey: #191923;
@@ -1226,4 +1226,101 @@ output {
   .hero-metric strong {
     font-size: 28px;
   }
+}
+
+/* Typography and overlap cleanup for laptop screens */
+body,
+input,
+select,
+button {
+  font-weight: 400;
+}
+
+h1,
+h2,
+h3,
+strong,
+label,
+output,
+.brand-name,
+.brand-mark,
+.status-chip,
+.compact-heading strong,
+.topbar h1,
+.topbar p,
+.section-heading h2,
+.compact-heading h3,
+.breakdown h3,
+.primary-button,
+.secondary-button,
+.ghost-button,
+.view-toggle button,
+.segmented-control button,
+.metric-grid strong,
+.hero-metric strong,
+.library-select strong,
+.size-cost-card header strong,
+.size-cost-card output {
+  font-weight: 500;
+}
+
+.brand-subtitle,
+.section-heading p,
+.compact-heading p,
+.library-select small,
+.bulk-row span,
+.hero-metric p,
+.breakdown-row div:first-child,
+.mini-grid label {
+  font-weight: 400;
+}
+
+input,
+select,
+.mini-grid input {
+  font-weight: 400;
+}
+
+.library-item {
+  overflow: hidden;
+}
+
+.library-select {
+  align-items: flex-start;
+}
+
+.library-select strong {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.library-select small {
+  display: -webkit-box;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-height: 1.35;
+}
+
+.size-cost-card header strong {
+  font-size: 14px;
+}
+
+.size-cost-card output {
+  font-size: 10px;
+}
+
+.compact-heading strong {
+  font-size: 13px;
+}
+
+.bulk-row {
+  min-width: 0;
+}
+
+.bulk-row input {
+  max-width: calc(100% - 28px);
 }
