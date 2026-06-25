@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArchiveThread UAE | Souvenir T-Shirt Calculator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="library-panel" aria-label="Saved T-shirt designs">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">AT</div>
+          <div>
+            <p class="brand-name">ArchiveThread UAE</p>
+            <p class="brand-subtitle">Premium souvenir pricing</p>
+          </div>
+        </div>
+
+        <div class="library-tools">
+          <label class="search-field">
+            <span class="sr-only">Search saved designs</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m21 21-4.2-4.2m1.2-5.3a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" /></svg>
+            <input id="librarySearch" type="search" placeholder="Search library" />
+          </label>
+          <select id="methodFilter" aria-label="Filter by printing method">
+            <option value="All">All methods</option>
+            <option value="DTF">DTF</option>
+            <option value="DTG">DTG</option>
+            <option value="Silk Screen">Silk Screen</option>
+          </select>
+        </div>
+
+        <div class="library-list" id="libraryList"></div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <h1>T-shirt cost and selling price calculator</h1>
+            <p>Estimate AED costs for premium UAE archive-quality DTF, DTG, and Silk Screen production.</p>
+          </div>
+          <div class="topbar-actions">
+            <button class="ghost-button" id="exportExcelButton" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14 3v4a2 2 0 0 0 2 2h4" /><path d="M5 3h9l6 6v12H5z" /><path d="M8 13h8M8 17h8" /></svg>
+              Export Excel
+            </button>
+            <button class="ghost-button" id="newDesignButton" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14" /></svg>
+              New
+            </button>
+          </div>
+        </header>
+
+        <section class="content-grid">
+          <form class="calculator-panel" id="calculatorForm">
+            <div class="section-heading">
+              <div>
+                <h2>Design details</h2>
+                <p>Build the production cost from blank shirt through packed sale.</p>
+              </div>
+              <div class="status-chip" id="editingStatus">New design</div>
+            </div>
+
+            <div class="preview-band">
+              <div class="shirt-preview" id="shirtPreview">
+                <div class="collar"></div>
+                <img id="mockupPreview" alt="" />
+                <div class="archive-print">UAE<br />ARCHIVE</div>
+              </div>
+              <div>
+                <label for="designName">Design name</label>
+                <input id="designName" name="designName" type="text" value="Dubai Creek Heritage Tee" />
+              </div>
+              <div>
+                <label for="colorway">Colorway</label>
+                <input id="colorway" name="colorway" type="text" value="Sand / Deep Green" />
+              </div>
+              <div class="mockup-upload">
+                <label for="mockupUpload">Mockup layout</label>
+                <input id="mockupUpload" name="mockupUpload" type="file" accept="image/*" />
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div>
+                <label for="gender">Gender</label>
+                <select id="gender" name="gender">
+                  <option value="Man">Man</option>
+                  <option value="Woman">Woman</option>
+                </select>
+              </div>
+              <div>
+                <label for="ageGroup">Age</label>
+                <select id="ageGroup" name="ageGroup">
+                  <option value="Adult">Adult</option>
+                  <option value="Kids">Kids</option>
+                </select>
+              </div>
+              <div>
+                <label for="method">Printing method</label>
+                <select id="method" name="method">
+                  <option value="DTF">DTF</option>
+                  <option value="DTG">DTG</option>
+                  <option value="Silk Screen">Silk Screen</option>
+                </select>
+              </div>
+              <div>
+                <label for="sizeS">Size S</label>
+                <input id="sizeS" name="sizeS" type="number" min="0" value="15" />
+              </div>
+              <div>
+                <label for="sizeM">Size M</label>
+                <input id="sizeM" name="sizeM" type="number" min="0" value="20" />
+              </div>
+              <div>
+                <label for="sizeL">Size L</label>
+                <input id="sizeL" name="sizeL" type="number" min="0" value="15" />
+              </div>
+              <div>
+                <label for="quantity">Total quantity</label>
+                <input id="quantity" name="quantity" type="number" min="1" value="50" readonly />
+              </div>
+              <div>
+                <label for="blankCost">Blank shirt cost</label>
+                <input id="blankCost" name="blankCost" type="number" min="0" step="0.01" value="25" />
+              </div>
+              <div>
+                <label for="printCost">Print cost per shirt</label>
+                <input id="printCost" name="printCost" type="number" min="0" step="0.01" value="35" />
+              </div>
+              <div>
+                <label for="setupFee">Print setup fee</label>
+                <input id="setupFee" name="setupFee" type="number" min="0" step="0.01" value="85" />
+              </div>
+              <div>
+                <label for="packaging">Packaging per shirt</label>
+                <input id="packaging" name="packaging" type="number" min="0" step="0.01" value="4.5" />
+              </div>
+              <div>
+                <label for="labelCost">Label / tag per shirt</label>
+                <input id="labelCost" name="labelCost" type="number" min="0" step="0.01" value="2.25" />
+              </div>
+              <div>
+                <label for="laborCost">Labor per shirt</label>
+                <input id="laborCost" name="laborCost" type="number" min="0" step="0.01" value="6" />
+              </div>
+              <div>
+                <label for="overhead">Computed overhead per shirt</label>
+                <input id="overhead" name="overhead" type="number" min="0" step="0.01" value="3.50" readonly />
+              </div>
+              <div>
+                <label for="margin">Desired margin</label>
+                <div class="range-row">
+                  <input id="margin" name="margin" type="range" min="5" max="80" value="55" />
+                  <output id="marginOutput" for="margin">55%</output>
+                </div>
+              </div>
+            </div>
+
+            <div class="subsection-panel">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3>Overhead cost breakdown</h3>
+                  <p>Enter batch costs once; the app divides them across S, M, and L quantities.</p>
+                </div>
+                <strong id="overheadTotal">AED 0.00 total</strong>
+              </div>
+              <div class="form-grid overhead-grid">
+                <div>
+                  <label for="overheadLicense">License / trade permit</label>
+                  <input id="overheadLicense" name="overheadLicense" type="number" min="0" step="0.01" value="60" />
+                </div>
+                <div>
+                  <label for="overheadDesignPermit">Design permit / archive rights</label>
+                  <input id="overheadDesignPermit" name="overheadDesignPermit" type="number" min="0" step="0.01" value="45" />
+                </div>
+                <div>
+                  <label for="overheadLabelsTags">Label tags batch cost</label>
+                  <input id="overheadLabelsTags" name="overheadLabelsTags" type="number" min="0" step="0.01" value="50" />
+                </div>
+                <div>
+                  <label for="overheadOther">Other overhead</label>
+                  <input id="overheadOther" name="overheadOther" type="number" min="0" step="0.01" value="20" />
+                </div>
+              </div>
+            </div>
+
+            <div class="option-row">
+              <label class="toggle">
+                <input id="vatEnabled" name="vatEnabled" type="checkbox" checked />
+                <span></span>
+                Add UAE VAT 5% to shelf price
+              </label>
+              <button class="text-button" id="applyPresetButton" type="button">Apply method preset</button>
+            </div>
+
+            <div class="action-row">
+              <button class="primary-button" id="saveButton" type="submit">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2Z" /><path d="M17 21v-8H7v8M7 3v5h8" /></svg>
+                Save design
+              </button>
+              <button class="secondary-button" id="duplicateButton" type="button">
+                <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 8h11v11H8z" /><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1" /></svg>
+                Duplicate
+              </button>
+            </div>
+          </form>
+
+          <aside class="summary-panel" aria-label="Pricing recommendation">
+            <div class="section-heading">
+              <div>
+                <h2>Price recommendation</h2>
+                <p>All figures are calculated in AED.</p>
+              </div>
+            </div>
+
+            <div class="hero-metric">
+              <span>Suggested selling price</span>
+              <strong id="sellingPrice">AED 0.00</strong>
+              <p id="vatNote">Includes 5% UAE VAT shelf price.</p>
+            </div>
+
+            <div class="metric-grid">
+              <div>
+                <span>Total production cost</span>
+                <strong id="totalCost">AED 0.00</strong>
+              </div>
+              <div>
+                <span>Cost per shirt</span>
+                <strong id="unitCost">AED 0.00</strong>
+              </div>
+              <div>
+                <span>Gross profit / shirt</span>
+                <strong id="grossProfit">AED 0.00</strong>
+              </div>
+              <div>
+                <span>Margin</span>
+                <strong id="actualMargin">0%</strong>
+              </div>
+            </div>
+
+            <div class="breakdown">
+              <h3>Cost mix</h3>
+              <div id="breakdownRows"></div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
