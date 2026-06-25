@@ -115,24 +115,12 @@
                 </select>
               </div>
               <div>
-                <label for="sizeS">Size S</label>
-                <input id="sizeS" name="sizeS" type="number" min="0" value="15" />
-              </div>
-              <div>
-                <label for="sizeM">Size M</label>
-                <input id="sizeM" name="sizeM" type="number" min="0" value="20" />
-              </div>
-              <div>
-                <label for="sizeL">Size L</label>
-                <input id="sizeL" name="sizeL" type="number" min="0" value="15" />
-              </div>
-              <div>
                 <label for="quantity">Total quantity</label>
                 <input id="quantity" name="quantity" type="number" min="1" value="50" readonly />
               </div>
               <div>
-                <label for="blankCost">Blank shirt cost</label>
-                <input id="blankCost" name="blankCost" type="number" min="0" step="0.01" value="25" />
+                <label for="blankCost">Average blank cost</label>
+                <input id="blankCost" name="blankCost" type="number" min="0" step="0.01" value="25" readonly />
               </div>
               <div>
                 <label for="printCost">Print cost per shirt</label>
@@ -164,6 +152,37 @@
                   <input id="margin" name="margin" type="range" min="5" max="80" value="55" />
                   <output id="marginOutput" for="margin">55%</output>
                 </div>
+              </div>
+            </div>
+
+            <div class="subsection-panel">
+              <div class="section-heading compact-heading">
+                <div>
+                  <h3>Size quantities and blank costs</h3>
+                  <p>Set different quantities and shirt blank prices for each required size.</p>
+                </div>
+                <strong id="blankTotal">AED 0.00 total</strong>
+              </div>
+              <div class="size-cost-grid">
+                <div class="size-cost-head">Size</div>
+                <div class="size-cost-head">Quantity</div>
+                <div class="size-cost-head">Blank cost / shirt</div>
+                <div class="size-cost-head">Line total</div>
+
+                <div class="size-label">S</div>
+                <input id="sizeS" name="sizeS" type="number" min="0" value="15" aria-label="Size S quantity" />
+                <input id="sizeSCost" name="sizeSCost" type="number" min="0" step="0.01" value="25" aria-label="Size S blank cost" />
+                <output id="sizeSTotal">AED 0.00</output>
+
+                <div class="size-label">M</div>
+                <input id="sizeM" name="sizeM" type="number" min="0" value="20" aria-label="Size M quantity" />
+                <input id="sizeMCost" name="sizeMCost" type="number" min="0" step="0.01" value="28" aria-label="Size M blank cost" />
+                <output id="sizeMTotal">AED 0.00</output>
+
+                <div class="size-label">L</div>
+                <input id="sizeL" name="sizeL" type="number" min="0" value="15" aria-label="Size L quantity" />
+                <input id="sizeLCost" name="sizeLCost" type="number" min="0" step="0.01" value="31" aria-label="Size L blank cost" />
+                <output id="sizeLTotal">AED 0.00</output>
               </div>
             </div>
 

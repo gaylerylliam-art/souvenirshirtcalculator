@@ -520,6 +520,42 @@ label {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.size-cost-grid {
+  display: grid;
+  grid-template-columns: 72px minmax(90px, 1fr) minmax(130px, 1fr) minmax(120px, 1fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.size-cost-head {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.size-label {
+  display: grid;
+  min-height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  color: var(--green);
+  font-weight: 900;
+}
+
+.size-cost-grid output {
+  display: grid;
+  min-height: 42px;
+  min-width: 0;
+  place-items: center start;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #f3f6f2;
+  font-size: 13px;
+}
+
 .bulk-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -802,7 +838,7 @@ output {
 
 .compare-table {
   width: 100%;
-  min-width: 820px;
+  min-width: 940px;
   border-collapse: collapse;
 }
 
@@ -856,6 +892,10 @@ output {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .size-cost-grid {
+    grid-template-columns: 56px repeat(3, minmax(0, 1fr));
+  }
+
   .bulk-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -895,6 +935,14 @@ output {
   .metric-grid,
   .library-list {
     grid-template-columns: 1fr;
+  }
+
+  .size-cost-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .size-cost-head {
+    display: none;
   }
 
   .shirt-preview {
