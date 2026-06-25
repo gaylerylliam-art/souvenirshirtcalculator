@@ -546,21 +546,48 @@ function renderBulkDiscounts() {
 }
 
 function renderBreakdown(result) {
-  const max = Math.max(...result.breakdown.map(([, value]) => value), 1);
-  document.querySelector("#breakdownRows").innerHTML = result.breakdown
-    .map(([label, value]) => {
-      const width = Math.max(4, (value / max) * 100);
-      return `
-        <div class="breakdown-row">
-          <div>
-            <span>${label}</span>
-            <strong>${AED.format(value)}</strong>
-          </div>
-          <div class="bar-track"><span style="width:${width}%"></span></div>
-        </div>
-      `;
-    })
-    .join("");
+  const total = result.breakdown.reduce((sum, [, value]) => sum + value, 0) || 1;
+  const colors = ["#5c95ff", "#ff3c38", "#ecc30b", "#191923", "#7fb7ff", "#ff8a86", "#f2d85a", "#5a5a6a", "#9fc5ff", "#ffd95a"];
+  let cursor = 0;
+  const slices = result.breakdown.map(([label, value], index) => {
+    const start = cursor;
+    const percent = (value / total) * 100;
+    cursor += percent;
+    return {
+      label,
+      value,
+      percent,
+      color: colors[index % colors.length],
+      start,
+      end: cursor
+    };
+  });
+  const gradient = slices
+    .map((slice) => `${slice.color} ${slice.start.toFixed(2)}% ${slice.end.toFixed(2)}%`)
+    .join(", ");
+
+  document.querySelector("#breakdownRows").innerHTML = `
+    <div class="pie-chart-wrap">
+      <div class="pie-chart" style="--pie:${gradient}" role="img" aria-label="Cost mix pie chart">
+        <span>${AED.format(total)}</span>
+        <small>Total cost</small>
+      </div>
+      <div class="pie-legend">
+        ${slices
+          .map(
+            (slice) => `
+              <div class="pie-legend-row">
+                <span class="pie-key" style="background:${slice.color}"></span>
+                <span class="pie-label">${slice.label}</span>
+                <strong>${AED.format(slice.value)}</strong>
+                <small>${Math.round(slice.percent)}%</small>
+              </div>
+            `
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
 }
 
 function renderLibrary() {
