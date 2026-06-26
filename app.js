@@ -57,6 +57,7 @@ const seedDesigns = [
     overheadLicense: 60,
     overheadDesignPermit: 45,
     overheadLabelsTags: 50,
+    overheadDelivery: 40,
     overheadOther: 20,
     margin: 55,
     vatEnabled: true,
@@ -98,6 +99,7 @@ const seedDesigns = [
     overheadLicense: 50,
     overheadDesignPermit: 45,
     overheadLabelsTags: 30,
+    overheadDelivery: 35,
     overheadOther: 15,
     margin: 58,
     vatEnabled: true,
@@ -139,6 +141,7 @@ const seedDesigns = [
     overheadLicense: 95,
     overheadDesignPermit: 80,
     overheadLabelsTags: 140,
+    overheadDelivery: 70,
     overheadOther: 45,
     margin: 52,
     vatEnabled: true,
@@ -181,6 +184,7 @@ const fields = [
   "overheadLicense",
   "overheadDesignPermit",
   "overheadLabelsTags",
+  "overheadDelivery",
   "overheadOther",
   "margin",
   "vatEnabled",
@@ -287,6 +291,7 @@ function getOverheadTotal(design) {
     designNumber(design, "overheadLicense") +
     designNumber(design, "overheadDesignPermit") +
     designNumber(design, "overheadLabelsTags") +
+    designNumber(design, "overheadDelivery") +
     designNumber(design, "overheadOther")
   );
 }
@@ -327,6 +332,7 @@ function getFormData() {
     overheadLicense: numericValue("overheadLicense"),
     overheadDesignPermit: numericValue("overheadDesignPermit"),
     overheadLabelsTags: numericValue("overheadLabelsTags"),
+    overheadDelivery: numericValue("overheadDelivery"),
     overheadOther: numericValue("overheadOther")
   });
 
@@ -349,6 +355,7 @@ function getFormData() {
     overheadLicense: numericValue("overheadLicense"),
     overheadDesignPermit: numericValue("overheadDesignPermit"),
     overheadLabelsTags: numericValue("overheadLabelsTags"),
+    overheadDelivery: numericValue("overheadDelivery"),
     overheadOther: numericValue("overheadOther"),
     margin: numericValue("margin"),
     vatEnabled: document.querySelector("#vatEnabled").checked,
@@ -402,6 +409,7 @@ function calculate(design) {
       ["License / trade permit", designNumber(design, "overheadLicense")],
       ["Design permit / archive rights", designNumber(design, "overheadDesignPermit")],
       ["Label tags batch", designNumber(design, "overheadLabelsTags")],
+      ["Delivery charges", designNumber(design, "overheadDelivery")],
       ["Other overhead", designNumber(design, "overheadOther")]
     ]
   };
@@ -481,6 +489,7 @@ function normalizeDesign(design) {
     overheadLicense: designNumber(design, "overheadLicense", overheadTotal),
     overheadDesignPermit: designNumber(design, "overheadDesignPermit", 0),
     overheadLabelsTags: designNumber(design, "overheadLabelsTags", 0),
+    overheadDelivery: designNumber(design, "overheadDelivery", 0),
     overheadOther: designNumber(design, "overheadOther", 0),
     overhead: overheadTotal / quantity
   };
@@ -718,6 +727,7 @@ function exportDesignsToExcel() {
       "License / Trade Permit AED": design.overheadLicense,
       "Design Permit / Archive Rights AED": design.overheadDesignPermit,
       "Label Tags Batch AED": design.overheadLabelsTags,
+      "Delivery Charges AED": design.overheadDelivery,
       "Other Overhead AED": design.overheadOther,
       "Overhead Total AED": result.overheadTotal.toFixed(2),
       "Overhead Per Shirt AED": result.overheadPerShirt.toFixed(2),
