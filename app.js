@@ -1762,6 +1762,26 @@ function exportCurrentDesignToPdf() {
   const breakdownRows = result.breakdown
     .map(([label, value]) => `<tr><td>${escapeExcelCell(label)}</td><td>${money(value)}</td></tr>`)
     .join("");
+  const pdfImages = normalizeShirtImages(design);
+  const pdfPhotoRows = [
+    ["front", t("front")],
+    ["back", t("back")],
+    ["right", t("right")],
+    ["left", t("left")]
+  ];
+  const pdfPhotoGrid = pdfPhotoRows
+    .map(([view, label]) => {
+      const image = pdfImages[view];
+      return `
+        <figure class="photo-card">
+          <div class="photo-frame">
+            ${image ? `<img src="${image}" alt="${escapeExcelCell(label)}" />` : `<span>${t("noPhoto")}</span>`}
+          </div>
+          <figcaption>${escapeExcelCell(label)}</figcaption>
+        </figure>
+      `;
+    })
+    .join("");
   const html = `
     <!doctype html>
     <html>
@@ -1783,6 +1803,12 @@ function exportCurrentDesignToPdf() {
           th { background: #eff6ff; color: #0c4a6e; }
           .summary { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); color: #0c4a6e; border: 1px solid #bae6fd; border-radius: 8px; padding: 18px; margin-top: 18px; }
           .summary strong { color: #0369a1; font-size: 28px; display: block; margin-top: 6px; }
+          .photo-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+          .photo-card { margin: 0; break-inside: avoid; }
+          .photo-frame { display: grid; aspect-ratio: 3 / 4; place-items: center; overflow: hidden; border: 1px solid #dbe4ee; border-radius: 8px; background: #f8fafc; }
+          .photo-frame img { width: 100%; height: 100%; object-fit: contain; }
+          .photo-frame span { color: #94a3b8; font-size: 12px; text-align: center; padding: 10px; }
+          figcaption { margin-top: 6px; color: #475569; font-size: 12px; font-weight: 700; text-align: center; text-transform: uppercase; }
           .footer { margin-top: 32px; color: #64748b; font-size: 12px; }
         </style>
       </head>
@@ -1801,6 +1827,9 @@ function exportCurrentDesignToPdf() {
           <div class="box"><div class="label">${t("printingMethod")}</div><div class="value">${design.method}</div></div>
           <div class="box"><div class="label">${t("specs")}</div><div class="value">${displayAge(design.ageGroup)} / ${displayGender(design.gender)}</div></div>
         </div>
+
+        <h2>${t("shirtPhotos")}</h2>
+        <div class="photo-grid">${pdfPhotoGrid}</div>
 
         <h2>${t("sizeBreakdown")}</h2>
         <table>
