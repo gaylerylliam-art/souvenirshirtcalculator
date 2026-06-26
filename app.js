@@ -1,10 +1,589 @@
 const STORAGE_KEY = "archivethread-uae-designs";
 const BULK_STORAGE_KEY = "archivethread-uae-bulk-discounts";
-const AED = new Intl.NumberFormat("en-AE", {
-  style: "currency",
-  currency: "AED",
-  minimumFractionDigits: 2
-});
+const CURRENCY_STORAGE_KEY = "archivethread-uae-currency";
+const LANGUAGE_STORAGE_KEY = "archivethread-worldwide-language";
+const currencyOptions = {
+  AED: { locale: "en-AE", label: "UAE dirham" },
+  USD: { locale: "en-US", label: "US dollar" },
+  EUR: { locale: "en-IE", label: "Euro" },
+  GBP: { locale: "en-GB", label: "British pound" },
+  PHP: { locale: "en-PH", label: "Philippine peso" },
+  INR: { locale: "en-IN", label: "Indian rupee" },
+  SAR: { locale: "en-SA", label: "Saudi riyal" }
+};
+const languageOptions = {
+  en: { label: "English", locale: "en-US", dir: "ltr" },
+  es: { label: "Español", locale: "es-ES", dir: "ltr" },
+  fr: { label: "Français", locale: "fr-FR", dir: "ltr" },
+  ar: { label: "العربية", locale: "ar-EG-u-nu-arab", dir: "rtl" },
+  hi: { label: "हिन्दी", locale: "hi-IN-u-nu-deva", dir: "ltr" },
+  zh: { label: "中文", locale: "zh-CN", dir: "ltr" },
+  fil: { label: "Filipino", locale: "fil-PH", dir: "ltr" }
+};
+const translations = {
+  en: {
+    appTitle: "ArchiveThread Worldwide | Archive Souvenir Shirt Calculator",
+    brandName: "ArchiveThread Worldwide",
+    brandSubtitle: "Global souvenir pricing",
+    savedDesignsLabel: "Saved shirt designs",
+    searchSavedDesigns: "Search saved designs",
+    searchLibrary: "Search library",
+    filterByMethod: "Filter by printing method",
+    allMethods: "All methods",
+    headline: "Archive souvenir shirt calculator",
+    intro: "Estimate costs for archive-quality souvenir shirt production anywhere in the world.",
+    language: "Language",
+    currency: "Currency",
+    exportPdf: "Export PDF",
+    exportExcel: "Export Excel",
+    new: "New",
+    singleDesign: "Single Design",
+    compareDesigns: "Compare Designs",
+    designDetails: "Design details",
+    designDetailsDescription: "Build the production cost from blank shirt through packed sale.",
+    newDesign: "New design",
+    editingSavedDesign: "Editing saved design",
+    archivePrint: "GLOBAL<br />ARCHIVE",
+    designName: "Design name",
+    colorway: "Colorway",
+    mockupLayout: "Mockup layout",
+    shirtPhotos: "Shirt photos",
+    shirtPhotosDescription: "Upload up to five views for product inspection.",
+    front: "Front",
+    back: "Back",
+    left: "Left side",
+    right: "Right side",
+    detail: "Detail",
+    view360: "360 view",
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    resetZoom: "Reset zoom",
+    noPhoto: "Upload a shirt photo",
+    gender: "Gender",
+    man: "Man",
+    woman: "Woman",
+    age: "Age",
+    adult: "Adult",
+    kids: "Kids",
+    printingMethod: "Printing method",
+    totalQuantity: "Total quantity",
+    averageBlankCost: "Average blank cost",
+    averagePrintCost: "Average print cost",
+    printSetupFee: "Print setup fee",
+    averagePackaging: "Average packaging",
+    averageLabelTag: "Average label / tag",
+    averageLabor: "Average labor",
+    computedOverhead: "Computed overhead per shirt",
+    desiredMargin: "Desired margin",
+    sizeQuantities: "Size quantities and blank costs",
+    sizeQuantitiesDescription: "Set different quantities and shirt blank prices for each required size.",
+    total: "total",
+    size: "Size",
+    qty: "Qty",
+    blank: "Blank",
+    print: "Print",
+    packaging: "Packaging",
+    label: "Label",
+    labor: "Labor",
+    overheadBreakdown: "Overhead cost breakdown",
+    overheadDescription: "Enter batch costs once; the app divides them across S, M, and L quantities.",
+    licenseTradePermit: "License / trade permit",
+    designPermit: "Design permit / archive rights",
+    labelTagsBatch: "Label tags batch cost",
+    deliveryCharges: "Delivery charges",
+    otherOverhead: "Other overhead",
+    otherOverheadDetails: "Other overhead details",
+    otherOverheadPlaceholder: "e.g. rush fee, storage, special trim",
+    bulkDiscounts: "Bulk pricing discounts",
+    bulkDescription: "Discounts are applied to cost per shirt before margin and tax.",
+    active: "active",
+    addTax: "Add VAT / sales tax 5% to shelf price",
+    applyPreset: "Apply method preset",
+    saveDesign: "Save design",
+    duplicate: "Duplicate",
+    priceRecommendation: "Price recommendation",
+    allFiguresUse: "All figures use {currency} ({currencyName}).",
+    suggestedSellingPrice: "Suggested selling price",
+    taxIncludedNote: "Includes 5% VAT / sales tax. Minimum premium shelf price is {price}.",
+    taxExcludedNote: "VAT / sales tax excluded. Minimum premium shelf price is {price}.",
+    bulkDiscount: "Bulk discount",
+    totalProductionCost: "Total production cost",
+    costPerShirt: "Cost per shirt",
+    grossProfit: "Gross profit / shirt",
+    margin: "Margin",
+    costMix: "Cost mix",
+    totalCost: "Total cost",
+    compareSavedDesigns: "Compare saved designs",
+    compareDescription: "Review production cost, bulk discount, margin, and suggested price across your library.",
+    design: "Design",
+    specs: "Specs",
+    discount: "Discount",
+    sellingPrice: "Selling price",
+    noSavedFilter: "No saved shirts match this filter.",
+    noSavedDesigns: "No saved designs yet.",
+    duplicateDesign: "Duplicate design",
+    deleteDesign: "Delete design",
+    units: "units",
+    unitsPlus: "{min}+ units",
+    unitRange: "{min}-{max} units",
+    pcs: "pcs",
+    untitled: "Untitled souvenir shirt",
+    customColorway: "Custom colorway",
+    blankShirtsBySize: "Blank shirts by size",
+    printingBySize: "Printing by size",
+    setup: "Setup",
+    packagingBySize: "Packaging by size",
+    labelBySize: "Label / tag by size",
+    laborBySize: "Labor by size",
+    labelTagsBatchShort: "Label tags batch",
+    otherOverheadShort: "Other overhead",
+    excelExported: "Excel file exported.",
+    allowPopups: "Allow popups to export PDF.",
+    designSaved: "Design saved to library.",
+    designDuplicated: "Design duplicated.",
+    designDeleted: "Design deleted.",
+    presetApplied: "Printing preset applied.",
+    mockupUploaded: "Mockup layout uploaded.",
+    currencyChanged: "Currency changed to {currency}.",
+    languageChanged: "Language changed to {language}.",
+    quoteTitle: "Premium Archive Souvenir Shirt Quote",
+    sizeBreakdown: "Size Breakdown",
+    costBreakdown: "Cost Breakdown",
+    item: "Item",
+    generated: "Generated {date} for ArchiveThread Worldwide.",
+    averageCostIncluding: "Average cost {cost} including shared costs",
+    quoteSummary: "Cost per shirt: {cost} · Bulk discount: {discount} · Gross profit per shirt: {profit} · Margin: {margin}",
+    excelFileName: "ArchiveThread-worldwide-shirt-pricing-{stamp}.xls"
+  }
+};
+
+translations.es = {
+  ...translations.en,
+  brandSubtitle: "Precios globales de recuerdos",
+  searchLibrary: "Buscar biblioteca",
+  allMethods: "Todos los métodos",
+  headline: "Calculadora mundial de camisetas souvenir de archivo",
+  intro: "Estima costos de producción de camisetas souvenir de calidad de archivo en cualquier lugar del mundo.",
+  language: "Idioma",
+  currency: "Moneda",
+  exportPdf: "Exportar PDF",
+  exportExcel: "Exportar Excel",
+  new: "Nuevo",
+  singleDesign: "Diseño individual",
+  compareDesigns: "Comparar diseños",
+  designDetails: "Detalles del diseño",
+  newDesign: "Nuevo diseño",
+  editingSavedDesign: "Editando diseño guardado",
+  designName: "Nombre del diseño",
+  colorway: "Combinación de color",
+  mockupLayout: "Mockup",
+  gender: "Género",
+  man: "Hombre",
+  woman: "Mujer",
+  age: "Edad",
+  adult: "Adulto",
+  kids: "Niños",
+  printingMethod: "Método de impresión",
+  totalQuantity: "Cantidad total",
+  desiredMargin: "Margen deseado",
+  total: "total",
+  size: "Talla",
+  qty: "Cant.",
+  blank: "Base",
+  print: "Impresión",
+  packaging: "Empaque",
+  label: "Etiqueta",
+  labor: "Mano de obra",
+  active: "activo",
+  addTax: "Añadir IVA / impuesto 5% al precio",
+  applyPreset: "Aplicar preajuste",
+  saveDesign: "Guardar diseño",
+  duplicate: "Duplicar",
+  priceRecommendation: "Recomendación de precio",
+  suggestedSellingPrice: "Precio de venta sugerido",
+  bulkDiscount: "Descuento por volumen",
+  totalProductionCost: "Costo total de producción",
+  costPerShirt: "Costo por camiseta",
+  grossProfit: "Ganancia / camiseta",
+  margin: "Margen",
+  costMix: "Mezcla de costos",
+  compareSavedDesigns: "Comparar diseños guardados",
+  design: "Diseño",
+  specs: "Especificaciones",
+  discount: "Descuento",
+  sellingPrice: "Precio de venta",
+  pcs: "uds.",
+  units: "unidades",
+  excelExported: "Archivo Excel exportado.",
+  allowPopups: "Permite ventanas emergentes para exportar PDF.",
+  designSaved: "Diseño guardado en la biblioteca.",
+  designDuplicated: "Diseño duplicado.",
+  designDeleted: "Diseño eliminado.",
+  presetApplied: "Preajuste de impresión aplicado.",
+  mockupUploaded: "Mockup cargado.",
+  currencyChanged: "Moneda cambiada a {currency}.",
+  languageChanged: "Idioma cambiado a {language}.",
+  quoteTitle: "Cotización premium de camiseta souvenir de archivo",
+  sizeBreakdown: "Desglose por tallas",
+  costBreakdown: "Desglose de costos",
+  item: "Artículo"
+};
+
+translations.fr = {
+  ...translations.en,
+  brandSubtitle: "Tarification souvenir mondiale",
+  searchLibrary: "Rechercher",
+  allMethods: "Toutes méthodes",
+  headline: "Calculateur mondial de chemises souvenir d'archive",
+  intro: "Estimez les coûts de production de chemises souvenir de qualité archive partout dans le monde.",
+  language: "Langue",
+  currency: "Devise",
+  exportPdf: "Exporter PDF",
+  exportExcel: "Exporter Excel",
+  new: "Nouveau",
+  singleDesign: "Un design",
+  compareDesigns: "Comparer",
+  designDetails: "Détails du design",
+  newDesign: "Nouveau design",
+  editingSavedDesign: "Design enregistré",
+  designName: "Nom du design",
+  colorway: "Coloris",
+  gender: "Genre",
+  man: "Homme",
+  woman: "Femme",
+  age: "Âge",
+  adult: "Adulte",
+  kids: "Enfants",
+  printingMethod: "Méthode d'impression",
+  totalQuantity: "Quantité totale",
+  desiredMargin: "Marge souhaitée",
+  total: "total",
+  size: "Taille",
+  qty: "Qté",
+  blank: "Vierge",
+  print: "Impression",
+  packaging: "Emballage",
+  label: "Étiquette",
+  labor: "Main-d'oeuvre",
+  active: "actif",
+  addTax: "Ajouter TVA / taxe 5% au prix",
+  applyPreset: "Appliquer le préréglage",
+  saveDesign: "Enregistrer",
+  duplicate: "Dupliquer",
+  priceRecommendation: "Recommandation de prix",
+  suggestedSellingPrice: "Prix de vente suggéré",
+  bulkDiscount: "Remise volume",
+  totalProductionCost: "Coût total de production",
+  costPerShirt: "Coût par chemise",
+  grossProfit: "Profit / chemise",
+  margin: "Marge",
+  costMix: "Répartition des coûts",
+  compareSavedDesigns: "Comparer les designs",
+  design: "Design",
+  specs: "Specs",
+  discount: "Remise",
+  sellingPrice: "Prix de vente",
+  pcs: "pcs",
+  units: "unités",
+  excelExported: "Fichier Excel exporté.",
+  allowPopups: "Autorisez les fenêtres pop-up pour exporter le PDF.",
+  designSaved: "Design enregistré.",
+  designDuplicated: "Design dupliqué.",
+  designDeleted: "Design supprimé.",
+  presetApplied: "Préréglage appliqué.",
+  mockupUploaded: "Mockup importé.",
+  currencyChanged: "Devise changée en {currency}.",
+  languageChanged: "Langue changée en {language}.",
+  quoteTitle: "Devis premium de chemise souvenir d'archive",
+  sizeBreakdown: "Détail des tailles",
+  costBreakdown: "Détail des coûts",
+  item: "Article"
+};
+
+translations.ar = {
+  ...translations.en,
+  brandSubtitle: "تسعير عالمي للهدايا التذكارية",
+  searchLibrary: "ابحث في المكتبة",
+  allMethods: "كل الطرق",
+  headline: "حاسبة عالمية لقمصان التذكارات الأرشيفية",
+  intro: "احسب تكاليف إنتاج قمصان تذكارية بجودة أرشيفية في أي مكان في العالم.",
+  language: "اللغة",
+  currency: "العملة",
+  exportPdf: "تصدير PDF",
+  exportExcel: "تصدير Excel",
+  new: "جديد",
+  singleDesign: "تصميم واحد",
+  compareDesigns: "مقارنة التصاميم",
+  designDetails: "تفاصيل التصميم",
+  newDesign: "تصميم جديد",
+  editingSavedDesign: "تحرير تصميم محفوظ",
+  designName: "اسم التصميم",
+  colorway: "الألوان",
+  mockupLayout: "النموذج",
+  gender: "الجنس",
+  man: "رجل",
+  woman: "امرأة",
+  age: "العمر",
+  adult: "بالغ",
+  kids: "أطفال",
+  printingMethod: "طريقة الطباعة",
+  totalQuantity: "الكمية الإجمالية",
+  desiredMargin: "الهامش المطلوب",
+  total: "الإجمالي",
+  size: "المقاس",
+  qty: "الكمية",
+  blank: "القميص",
+  print: "الطباعة",
+  packaging: "التغليف",
+  label: "الملصق",
+  labor: "العمل",
+  active: "نشط",
+  addTax: "إضافة ضريبة ٥٪ إلى سعر البيع",
+  applyPreset: "تطبيق الإعداد",
+  saveDesign: "حفظ التصميم",
+  duplicate: "نسخ",
+  priceRecommendation: "توصية السعر",
+  suggestedSellingPrice: "سعر البيع المقترح",
+  bulkDiscount: "خصم الكمية",
+  totalProductionCost: "إجمالي تكلفة الإنتاج",
+  costPerShirt: "التكلفة لكل قميص",
+  grossProfit: "الربح لكل قميص",
+  margin: "الهامش",
+  costMix: "مزيج التكلفة",
+  compareSavedDesigns: "مقارنة التصاميم المحفوظة",
+  design: "التصميم",
+  specs: "المواصفات",
+  discount: "الخصم",
+  sellingPrice: "سعر البيع",
+  pcs: "قطعة",
+  units: "وحدة",
+  excelExported: "تم تصدير ملف Excel.",
+  allowPopups: "اسمح بالنوافذ المنبثقة لتصدير PDF.",
+  designSaved: "تم حفظ التصميم.",
+  designDuplicated: "تم نسخ التصميم.",
+  designDeleted: "تم حذف التصميم.",
+  presetApplied: "تم تطبيق إعداد الطباعة.",
+  mockupUploaded: "تم رفع النموذج.",
+  currencyChanged: "تم تغيير العملة إلى {currency}.",
+  languageChanged: "تم تغيير اللغة إلى {language}.",
+  quoteTitle: "عرض سعر لقميص تذكاري أرشيفي فاخر",
+  sizeBreakdown: "تفصيل المقاسات",
+  costBreakdown: "تفصيل التكاليف",
+  item: "البند"
+};
+
+translations.hi = {
+  ...translations.en,
+  brandSubtitle: "वैश्विक स्मारिका मूल्य निर्धारण",
+  searchLibrary: "लाइब्रेरी खोजें",
+  allMethods: "सभी तरीके",
+  headline: "विश्वव्यापी आर्काइव स्मारिका शर्ट कैलकुलेटर",
+  intro: "दुनिया में कहीं भी आर्काइव-क्वालिटी स्मारिका शर्ट उत्पादन की लागत का अनुमान लगाएं.",
+  language: "भाषा",
+  currency: "मुद्रा",
+  exportPdf: "PDF निर्यात",
+  exportExcel: "Excel निर्यात",
+  new: "नया",
+  singleDesign: "एक डिजाइन",
+  compareDesigns: "डिजाइन तुलना",
+  designDetails: "डिजाइन विवरण",
+  newDesign: "नया डिजाइन",
+  editingSavedDesign: "सहेजा डिजाइन संपादित",
+  designName: "डिजाइन नाम",
+  colorway: "रंग संयोजन",
+  gender: "लिंग",
+  man: "पुरुष",
+  woman: "महिला",
+  age: "आयु",
+  adult: "वयस्क",
+  kids: "बच्चे",
+  printingMethod: "प्रिंटिंग तरीका",
+  totalQuantity: "कुल मात्रा",
+  desiredMargin: "वांछित मार्जिन",
+  total: "कुल",
+  size: "साइज",
+  qty: "मात्रा",
+  blank: "ब्लैंक",
+  print: "प्रिंट",
+  packaging: "पैकेजिंग",
+  label: "लेबल",
+  labor: "श्रम",
+  active: "सक्रिय",
+  addTax: "शेल्फ मूल्य में 5% VAT / बिक्री कर जोड़ें",
+  applyPreset: "प्रीसेट लगाएं",
+  saveDesign: "डिजाइन सहेजें",
+  duplicate: "डुप्लिकेट",
+  priceRecommendation: "मूल्य सुझाव",
+  suggestedSellingPrice: "सुझाया बिक्री मूल्य",
+  bulkDiscount: "थोक छूट",
+  totalProductionCost: "कुल उत्पादन लागत",
+  costPerShirt: "प्रति शर्ट लागत",
+  grossProfit: "प्रति शर्ट लाभ",
+  margin: "मार्जिन",
+  costMix: "लागत मिश्रण",
+  compareSavedDesigns: "सहेजे डिजाइन तुलना",
+  design: "डिजाइन",
+  specs: "विवरण",
+  discount: "छूट",
+  sellingPrice: "बिक्री मूल्य",
+  pcs: "पीस",
+  units: "इकाइयां",
+  excelExported: "Excel फ़ाइल निर्यात हुई.",
+  allowPopups: "PDF निर्यात के लिए पॉपअप अनुमति दें.",
+  designSaved: "डिजाइन लाइब्रेरी में सहेजा गया.",
+  designDuplicated: "डिजाइन डुप्लिकेट हुआ.",
+  designDeleted: "डिजाइन हटाया गया.",
+  presetApplied: "प्रिंटिंग प्रीसेट लगाया गया.",
+  mockupUploaded: "Mockup अपलोड हुआ.",
+  currencyChanged: "मुद्रा {currency} में बदली.",
+  languageChanged: "भाषा {language} में बदली.",
+  quoteTitle: "प्रीमियम आर्काइव स्मारिका शर्ट कोट",
+  sizeBreakdown: "साइज विवरण",
+  costBreakdown: "लागत विवरण",
+  item: "आइटम"
+};
+
+translations.zh = {
+  ...translations.en,
+  brandSubtitle: "全球纪念品定价",
+  searchLibrary: "搜索资料库",
+  allMethods: "所有工艺",
+  headline: "全球档案纪念衫计算器",
+  intro: "估算世界各地档案品质纪念衫的生产成本。",
+  language: "语言",
+  currency: "货币",
+  exportPdf: "导出 PDF",
+  exportExcel: "导出 Excel",
+  new: "新建",
+  singleDesign: "单个设计",
+  compareDesigns: "比较设计",
+  designDetails: "设计详情",
+  newDesign: "新设计",
+  editingSavedDesign: "编辑已保存设计",
+  designName: "设计名称",
+  colorway: "配色",
+  gender: "性别",
+  man: "男",
+  woman: "女",
+  age: "年龄",
+  adult: "成人",
+  kids: "儿童",
+  printingMethod: "印刷方式",
+  totalQuantity: "总数量",
+  desiredMargin: "目标利润率",
+  total: "合计",
+  size: "尺码",
+  qty: "数量",
+  blank: "空白衫",
+  print: "印刷",
+  packaging: "包装",
+  label: "标签",
+  labor: "人工",
+  active: "生效",
+  addTax: "加入 5% VAT / 销售税",
+  applyPreset: "应用预设",
+  saveDesign: "保存设计",
+  duplicate: "复制",
+  priceRecommendation: "价格建议",
+  suggestedSellingPrice: "建议售价",
+  bulkDiscount: "批量折扣",
+  totalProductionCost: "总生产成本",
+  costPerShirt: "每件成本",
+  grossProfit: "每件毛利",
+  margin: "利润率",
+  costMix: "成本构成",
+  compareSavedDesigns: "比较已保存设计",
+  design: "设计",
+  specs: "规格",
+  discount: "折扣",
+  sellingPrice: "售价",
+  pcs: "件",
+  units: "件",
+  excelExported: "Excel 文件已导出。",
+  allowPopups: "请允许弹窗以导出 PDF。",
+  designSaved: "设计已保存。",
+  designDuplicated: "设计已复制。",
+  designDeleted: "设计已删除。",
+  presetApplied: "印刷预设已应用。",
+  mockupUploaded: "Mockup 已上传。",
+  currencyChanged: "货币已切换为 {currency}。",
+  languageChanged: "语言已切换为 {language}。",
+  quoteTitle: "高级档案纪念衫报价",
+  sizeBreakdown: "尺码明细",
+  costBreakdown: "成本明细",
+  item: "项目"
+};
+
+translations.fil = {
+  ...translations.en,
+  brandSubtitle: "Pandaigdigang presyo ng souvenir",
+  searchLibrary: "Hanapin sa library",
+  allMethods: "Lahat ng paraan",
+  headline: "Worldwide archive souvenir shirt calculator",
+  intro: "Tantiyahin ang gastos sa paggawa ng archive-quality souvenir shirts saanman sa mundo.",
+  language: "Wika",
+  currency: "Currency",
+  exportPdf: "I-export PDF",
+  exportExcel: "I-export Excel",
+  new: "Bago",
+  singleDesign: "Isang Design",
+  compareDesigns: "Ikumpara",
+  designDetails: "Detalye ng design",
+  newDesign: "Bagong design",
+  editingSavedDesign: "Ina-edit ang saved design",
+  designName: "Pangalan ng design",
+  colorway: "Colorway",
+  gender: "Kasarian",
+  man: "Lalaki",
+  woman: "Babae",
+  age: "Edad",
+  adult: "Adult",
+  kids: "Kids",
+  printingMethod: "Paraan ng print",
+  totalQuantity: "Kabuuang dami",
+  desiredMargin: "Target margin",
+  total: "total",
+  size: "Size",
+  qty: "Qty",
+  blank: "Blank",
+  print: "Print",
+  packaging: "Packaging",
+  label: "Label",
+  labor: "Labor",
+  active: "active",
+  addTax: "Magdagdag ng 5% VAT / sales tax sa shelf price",
+  applyPreset: "Apply preset",
+  saveDesign: "I-save design",
+  duplicate: "Duplicate",
+  priceRecommendation: "Presyo recommendation",
+  suggestedSellingPrice: "Suggested selling price",
+  bulkDiscount: "Bulk discount",
+  totalProductionCost: "Total production cost",
+  costPerShirt: "Cost per shirt",
+  grossProfit: "Gross profit / shirt",
+  margin: "Margin",
+  costMix: "Cost mix",
+  compareSavedDesigns: "Ikumpara saved designs",
+  design: "Design",
+  specs: "Specs",
+  discount: "Discount",
+  sellingPrice: "Selling price",
+  pcs: "pcs",
+  units: "units",
+  excelExported: "Na-export ang Excel file.",
+  allowPopups: "Payagan ang popups para mag-export ng PDF.",
+  designSaved: "Na-save ang design sa library.",
+  designDuplicated: "Na-duplicate ang design.",
+  designDeleted: "Na-delete ang design.",
+  presetApplied: "Na-apply ang printing preset.",
+  mockupUploaded: "Na-upload ang mockup.",
+  currencyChanged: "Currency changed to {currency}.",
+  languageChanged: "Wika changed to {language}.",
+  quoteTitle: "Premium Archive Souvenir Shirt Quote",
+  sizeBreakdown: "Size Breakdown",
+  costBreakdown: "Cost Breakdown",
+  item: "Item"
+};
 
 const methodPresets = {
   DTF: { printCost: 35, setupFee: 85, color: "#2563eb" },
@@ -13,6 +592,7 @@ const methodPresets = {
 };
 
 const MIN_SELLING_PRICE = 250;
+const shirtViewKeys = ["front", "back", "left", "right", "detail"];
 const defaultBulkDiscounts = [
   { minQty: 1, maxQty: 24, discountPercent: 0 },
   { minQty: 25, maxQty: 49, discountPercent: 3 },
@@ -59,9 +639,11 @@ const seedDesigns = [
     overheadLabelsTags: 50,
     overheadDelivery: 40,
     overheadOther: 20,
+    overheadOtherDetails: "Special handling and storage",
     margin: 55,
     vatEnabled: true,
-    mockupImage: ""
+    mockupImage: "",
+    shirtImages: { front: "", back: "", left: "", right: "", detail: "" }
   },
   {
     id: crypto.randomUUID(),
@@ -101,9 +683,11 @@ const seedDesigns = [
     overheadLabelsTags: 30,
     overheadDelivery: 35,
     overheadOther: 15,
+    overheadOtherDetails: "Market display handling",
     margin: 58,
     vatEnabled: true,
-    mockupImage: ""
+    mockupImage: "",
+    shirtImages: { front: "", back: "", left: "", right: "", detail: "" }
   },
   {
     id: crypto.randomUUID(),
@@ -143,9 +727,11 @@ const seedDesigns = [
     overheadLabelsTags: 140,
     overheadDelivery: 70,
     overheadOther: 45,
+    overheadOtherDetails: "Limited run setup supplies",
     margin: 52,
     vatEnabled: true,
-    mockupImage: ""
+    mockupImage: "",
+    shirtImages: { front: "", back: "", left: "", right: "", detail: "" }
   }
 ];
 
@@ -186,6 +772,7 @@ const fields = [
   "overheadLabelsTags",
   "overheadDelivery",
   "overheadOther",
+  "overheadOtherDetails",
   "margin",
   "vatEnabled",
   "mockupImage"
@@ -200,9 +787,240 @@ const toast = document.querySelector("#toast");
 
 let designs = loadDesigns();
 let bulkDiscounts = loadBulkDiscounts();
+let activeCurrency = loadCurrency();
+let activeLanguage = loadLanguage();
 let activeId = designs[0]?.id || null;
 let currentMockupImage = designs[0]?.mockupImage || "";
+let currentShirtImages = normalizeShirtImages(designs[0]);
+let activeShirtView = "front";
+let viewerZoom = 1;
+let spinTimer = null;
 let activeView = "single";
+
+function loadLanguage() {
+  const saved = localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return languageOptions[saved] ? saved : "en";
+}
+
+function persistLanguage() {
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, activeLanguage);
+}
+
+function locale() {
+  return languageOptions[activeLanguage]?.locale || languageOptions.en.locale;
+}
+
+function direction() {
+  return languageOptions[activeLanguage]?.dir || "ltr";
+}
+
+function t(key, values = {}) {
+  const phrase = translations[activeLanguage]?.[key] ?? translations.en[key] ?? key;
+  return Object.entries(values).reduce((text, [name, value]) => text.replaceAll(`{${name}}`, value), phrase);
+}
+
+function number(value, options = {}) {
+  return new Intl.NumberFormat(locale(), options).format(value);
+}
+
+function percent(value) {
+  return `${number(value)}%`;
+}
+
+function localizedDate(value = new Date()) {
+  return new Intl.DateTimeFormat(locale(), {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(value);
+}
+
+function displayGender(value) {
+  return value === "Woman" ? t("woman") : t("man");
+}
+
+function displayAge(value) {
+  return value === "Kids" ? t("kids") : t("adult");
+}
+
+function loadCurrency() {
+  const saved = localStorage.getItem(CURRENCY_STORAGE_KEY);
+  return currencyOptions[saved] ? saved : "AED";
+}
+
+function persistCurrency() {
+  localStorage.setItem(CURRENCY_STORAGE_KEY, activeCurrency);
+}
+
+function money(value) {
+  const currency = currencyOptions[activeCurrency] ? activeCurrency : "AED";
+  return new Intl.NumberFormat(locale(), {
+    style: "currency",
+    currency,
+    minimumFractionDigits: 2
+  }).format(value);
+}
+
+function currencyName() {
+  return currencyOptions[activeCurrency]?.label || currencyOptions.AED.label;
+}
+
+function setText(selector, key, values = {}) {
+  const element = document.querySelector(selector);
+  if (element) element.textContent = t(key, values);
+}
+
+function setHtml(selector, key, values = {}) {
+  const element = document.querySelector(selector);
+  if (element) element.innerHTML = t(key, values);
+}
+
+function setButtonText(selector, key) {
+  const button = document.querySelector(selector);
+  if (!button) return;
+  const textNode = Array.from(button.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+  if (textNode) {
+    textNode.textContent = ` ${t(key)}`;
+  } else {
+    button.append(` ${t(key)}`);
+  }
+}
+
+function setLabelPrefix(selector, key) {
+  const label = document.querySelector(selector);
+  if (!label) return;
+  const textNode = Array.from(label.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+  if (textNode) textNode.textContent = t(key);
+}
+
+function setOptionText(selector, value, key) {
+  const option = document.querySelector(`${selector} option[value="${value}"]`);
+  if (option) option.textContent = t(key);
+}
+
+function applyTranslations() {
+  const language = languageOptions[activeLanguage] || languageOptions.en;
+  document.documentElement.lang = activeLanguage;
+  document.documentElement.dir = direction();
+  document.title = t("appTitle");
+  document.querySelector("#languageSelect").value = activeLanguage;
+  document.querySelector("#currencySelect").value = activeCurrency;
+
+  document.querySelector(".library-panel")?.setAttribute("aria-label", t("savedDesignsLabel"));
+  document.querySelector("#librarySearch")?.setAttribute("placeholder", t("searchLibrary"));
+  document.querySelector("#methodFilter")?.setAttribute("aria-label", t("filterByMethod"));
+  document.querySelector("#singleView")?.setAttribute("aria-label", t("singleDesign"));
+  document.querySelector("#compareView")?.setAttribute("aria-label", t("compareSavedDesigns"));
+
+  setText(".brand-name", "brandName");
+  setText(".brand-subtitle", "brandSubtitle");
+  setText(".topbar h1", "headline");
+  setText(".topbar p", "intro");
+  setText(".language-control span", "language");
+  setText(".currency-control span", "currency");
+  setButtonText("#exportPdfButton", "exportPdf");
+  setButtonText("#exportExcelButton", "exportExcel");
+  setButtonText("#newDesignButton", "new");
+  setText("#singleViewButton", "singleDesign");
+  setText("#compareViewButton", "compareDesigns");
+  setText("#calculatorForm > .section-heading h2", "designDetails");
+  setText("#calculatorForm > .section-heading p", "designDetailsDescription");
+  setHtml(".archive-print", "archivePrint");
+  setText('label[for="designName"]', "designName");
+  setText('label[for="colorway"]', "colorway");
+  setText(".photo-upload-panel h3", "shirtPhotos");
+  setText(".photo-upload-panel p", "shirtPhotosDescription");
+  setLabelPrefix('label[for="frontUpload"]', "front");
+  setLabelPrefix('label[for="backUpload"]', "back");
+  setLabelPrefix('label[for="leftUpload"]', "left");
+  setLabelPrefix('label[for="rightUpload"]', "right");
+  setLabelPrefix('label[for="detailUpload"]', "detail");
+  setText('label[for="gender"]', "gender");
+  setText('label[for="ageGroup"]', "age");
+  setText(".method-group > label", "printingMethod");
+  setText('label[for="quantity"]', "totalQuantity");
+  setText('label[for="blankCost"]', "averageBlankCost");
+  setText('label[for="printCost"]', "averagePrintCost");
+  setText('label[for="setupFee"]', "printSetupFee");
+  setText('label[for="packaging"]', "averagePackaging");
+  setText('label[for="labelCost"]', "averageLabelTag");
+  setText('label[for="laborCost"]', "averageLabor");
+  setText('label[for="overhead"]', "computedOverhead");
+  setText('label[for="margin"]', "desiredMargin");
+  const panels = document.querySelectorAll(".subsection-panel");
+  if (panels[0]) {
+    panels[0].querySelector("h3").textContent = t("sizeQuantities");
+    panels[0].querySelector("p").textContent = t("sizeQuantitiesDescription");
+  }
+  if (panels[1]) {
+    panels[1].querySelector("h3").textContent = t("overheadBreakdown");
+    panels[1].querySelector("p").textContent = t("overheadDescription");
+  }
+  setText('label[for="overheadLicense"]', "licenseTradePermit");
+  setText('label[for="overheadDesignPermit"]', "designPermit");
+  setText('label[for="overheadLabelsTags"]', "labelTagsBatch");
+  setText('label[for="overheadDelivery"]', "deliveryCharges");
+  setText('label[for="overheadOther"]', "otherOverhead");
+  setText('label[for="overheadOtherDetails"]', "otherOverheadDetails");
+  document.querySelector("#overheadOtherDetails")?.setAttribute("placeholder", t("otherOverheadPlaceholder"));
+  if (panels[2]) {
+    panels[2].querySelector("h3").textContent = t("bulkDiscounts");
+    panels[2].querySelector("p").textContent = t("bulkDescription");
+  }
+  const toggle = document.querySelector(".toggle");
+  if (toggle) {
+    const textNode = Array.from(toggle.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+    if (textNode) textNode.textContent = ` ${t("addTax")}`;
+  }
+  setText("#applyPresetButton", "applyPreset");
+  setButtonText("#saveButton", "saveDesign");
+  setButtonText("#duplicateButton", "duplicate");
+  setText(".summary-panel .section-heading h2", "priceRecommendation");
+  setText(".hero-metric span", "suggestedSellingPrice");
+  setText(".metric-grid div:nth-child(1) span", "bulkDiscount");
+  setText(".metric-grid div:nth-child(2) span", "totalProductionCost");
+  setText(".metric-grid div:nth-child(3) span", "costPerShirt");
+  setText(".metric-grid div:nth-child(4) span", "grossProfit");
+  setText(".metric-grid div:nth-child(5) span", "margin");
+  setText(".breakdown h3", "costMix");
+  setText("#compareView .section-heading h2", "compareSavedDesigns");
+  setText("#compareView .section-heading p", "compareDescription");
+
+  const headers = document.querySelectorAll(".compare-table th");
+  ["design", "specs", "qty", "costPerShirt", "discount", "sellingPrice", "margin"].forEach((key, index) => {
+    if (headers[index]) headers[index].textContent = t(key);
+  });
+
+  setOptionText("#methodFilter", "All", "allMethods");
+  setOptionText("#gender", "Man", "man");
+  setOptionText("#gender", "Woman", "woman");
+  setOptionText("#ageGroup", "Adult", "adult");
+  setOptionText("#ageGroup", "Kids", "kids");
+
+  document.querySelectorAll(".mini-grid label").forEach((label) => {
+    const input = label.querySelector("input");
+    if (!input) return;
+    const key = input.id.includes("Cost") ? "blank" : input.id.includes("Print") ? "print" : input.id.includes("Packaging") ? "packaging" : input.id.includes("Label") ? "label" : input.id.includes("Labor") ? "labor" : "qty";
+    const textNode = Array.from(label.childNodes).find((node) => node.nodeType === Node.TEXT_NODE);
+    if (textNode) textNode.textContent = t(key);
+  });
+
+  document.body.style.direction = language.dir;
+}
+
+function normalizeShirtImages(design = {}) {
+  const images = design.shirtImages && typeof design.shirtImages === "object" ? design.shirtImages : {};
+  return shirtViewKeys.reduce((next, key) => {
+    next[key] = images[key] || (key === "front" ? design.mockupImage || "" : "");
+    return next;
+  }, {});
+}
+
+function stopSpin() {
+  if (!spinTimer) return;
+  clearInterval(spinTimer);
+  spinTimer = null;
+  document.querySelector("#spinViewButton")?.classList.remove("active");
+}
 
 function loadDesigns() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -244,6 +1062,10 @@ function numericValue(id) {
 function designNumber(design, key, fallback = 0) {
   const value = Number(design[key]);
   return Number.isFinite(value) ? value : fallback;
+}
+
+function designText(design, key, fallback = "") {
+  return String(design[key] ?? fallback).trim();
 }
 
 function getSizeQuantityFromInputs() {
@@ -335,11 +1157,12 @@ function getFormData() {
     overheadDelivery: numericValue("overheadDelivery"),
     overheadOther: numericValue("overheadOther")
   });
+  const overheadOtherDetails = document.querySelector("#overheadOtherDetails").value.trim();
 
   return {
     id: activeId || crypto.randomUUID(),
-    designName: document.querySelector("#designName").value.trim() || "Untitled souvenir shirt",
-    colorway: document.querySelector("#colorway").value.trim() || "Custom colorway",
+    designName: document.querySelector("#designName").value.trim() || t("untitled"),
+    colorway: document.querySelector("#colorway").value.trim() || t("customColorway"),
     gender: document.querySelector("#gender").value,
     ageGroup: document.querySelector("#ageGroup").value,
     method: document.querySelector("#method").value,
@@ -357,9 +1180,11 @@ function getFormData() {
     overheadLabelsTags: numericValue("overheadLabelsTags"),
     overheadDelivery: numericValue("overheadDelivery"),
     overheadOther: numericValue("overheadOther"),
+    overheadOtherDetails,
     margin: numericValue("margin"),
     vatEnabled: document.querySelector("#vatEnabled").checked,
-    mockupImage: currentMockupImage
+    mockupImage: currentShirtImages.front || currentMockupImage,
+    shirtImages: { ...currentShirtImages }
   };
 }
 
@@ -400,24 +1225,28 @@ function calculate(design) {
     grossProfit,
     actualMargin,
     breakdown: [
-      ["Blank shirts by size", averageBlankCost * quantity],
-      ["Printing by size", averagePrintCost * quantity],
-      ["Setup", designNumber(design, "setupFee")],
-      ["Packaging by size", averagePackaging * quantity],
-      ["Label / tag by size", averageLabel * quantity],
-      ["Labor by size", averageLabor * quantity],
-      ["License / trade permit", designNumber(design, "overheadLicense")],
-      ["Design permit / archive rights", designNumber(design, "overheadDesignPermit")],
-      ["Label tags batch", designNumber(design, "overheadLabelsTags")],
-      ["Delivery charges", designNumber(design, "overheadDelivery")],
-      ["Other overhead", designNumber(design, "overheadOther")]
+      [t("blankShirtsBySize"), averageBlankCost * quantity],
+      [t("printingBySize"), averagePrintCost * quantity],
+      [t("setup"), designNumber(design, "setupFee")],
+      [t("packagingBySize"), averagePackaging * quantity],
+      [t("labelBySize"), averageLabel * quantity],
+      [t("laborBySize"), averageLabor * quantity],
+      [t("licenseTradePermit"), designNumber(design, "overheadLicense")],
+      [t("designPermit"), designNumber(design, "overheadDesignPermit")],
+      [t("labelTagsBatchShort"), designNumber(design, "overheadLabelsTags")],
+      [t("deliveryCharges"), designNumber(design, "overheadDelivery")],
+      [designText(design, "overheadOtherDetails") || t("otherOverheadShort"), designNumber(design, "overheadOther")]
     ]
   };
 }
 
 function setFormData(design) {
-  currentMockupImage = design.mockupImage || "";
   const nextDesign = normalizeDesign(design);
+  currentShirtImages = normalizeShirtImages(nextDesign);
+  currentMockupImage = currentShirtImages.front || nextDesign.mockupImage || "";
+  activeShirtView = shirtViewKeys.find((key) => currentShirtImages[key]) || "front";
+  viewerZoom = 1;
+  stopSpin();
   fields.forEach((field) => {
     if (field === "mockupImage") return;
     const input = document.querySelector(`#${field}`);
@@ -491,7 +1320,10 @@ function normalizeDesign(design) {
     overheadLabelsTags: designNumber(design, "overheadLabelsTags", 0),
     overheadDelivery: designNumber(design, "overheadDelivery", 0),
     overheadOther: designNumber(design, "overheadOther", 0),
-    overhead: overheadTotal / quantity
+    overheadOtherDetails: designText(design, "overheadOtherDetails"),
+    overhead: overheadTotal / quantity,
+    shirtImages: normalizeShirtImages(design),
+    mockupImage: normalizeShirtImages(design).front
   };
 }
 
@@ -501,36 +1333,53 @@ function updateUI() {
   const methodColor = methodPresets[design.method]?.color || "#2563eb";
   const mockupPreview = document.querySelector("#mockupPreview");
 
-  marginOutput.value = `${design.margin}%`;
+  applyTranslations();
+  document.querySelector("#currencySelect").value = activeCurrency;
+  document.querySelector("#languageSelect").value = activeLanguage;
+  document.querySelector("#currencyNote").textContent = t("allFiguresUse", { currency: activeCurrency, currencyName: currencyName() });
+  marginOutput.value = percent(design.margin);
   document.querySelector("#quantity").value = design.quantity;
   document.querySelector("#blankCost").value = getWeightedAverage(design, "blank").toFixed(2);
   document.querySelector("#printCost").value = getWeightedAverage(design, "print").toFixed(2);
   document.querySelector("#packaging").value = getWeightedAverage(design, "packaging").toFixed(2);
   document.querySelector("#labelCost").value = getWeightedAverage(design, "label").toFixed(2);
   document.querySelector("#laborCost").value = getWeightedAverage(design, "labor").toFixed(2);
-  document.querySelector("#blankTotal").textContent = `${AED.format(result.sizeProductionTotal)} total`;
+  document.querySelector("#blankTotal").textContent = `${money(result.sizeProductionTotal)} ${t("total")}`;
   getSizeRows(design).forEach((row) => {
-    document.querySelector(`#size${row.size}Total`).textContent = AED.format(row.total);
+    document.querySelector(`#size${row.size}Total`).textContent = money(row.total);
   });
   document.querySelector("#overhead").value = result.overheadPerShirt.toFixed(2);
-  document.querySelector("#overheadTotal").textContent = `${AED.format(result.overheadTotal)} total`;
-  document.querySelector("#bulkDiscount").textContent = `${result.bulkDiscount}%`;
-  document.querySelector("#activeBulkDiscount").textContent = `${result.bulkDiscount}% active`;
-  document.querySelector("#editingStatus").textContent = activeId ? "Editing saved design" : "New design";
+  document.querySelector("#overheadTotal").textContent = `${money(result.overheadTotal)} ${t("total")}`;
+  document.querySelector("#bulkDiscount").textContent = percent(result.bulkDiscount);
+  document.querySelector("#activeBulkDiscount").textContent = `${percent(result.bulkDiscount)} ${t("active")}`;
+  document.querySelector("#editingStatus").textContent = activeId ? t("editingSavedDesign") : t("newDesign");
   document.querySelector("#shirtPreview").style.setProperty("--print-color", methodColor);
   document.querySelectorAll("[data-method-option]").forEach((button) => {
     button.classList.toggle("active", button.dataset.methodOption === design.method);
   });
-  mockupPreview.src = design.mockupImage || "";
-  mockupPreview.hidden = !design.mockupImage;
-  document.querySelector("#sellingPrice").textContent = AED.format(result.sellingPrice);
+  const selectedImage = currentShirtImages[activeShirtView] || shirtViewKeys.map((key) => currentShirtImages[key]).find(Boolean) || "";
+  mockupPreview.src = selectedImage;
+  mockupPreview.alt = selectedImage ? `${t(activeShirtView)} ${t("shirtPhotos")}` : t("noPhoto");
+  mockupPreview.hidden = !selectedImage;
+  document.querySelector("#shirtPreview").style.setProperty("--zoom", viewerZoom.toFixed(2));
+  document.querySelector("#resetZoomButton").textContent = `${Math.round(viewerZoom * 100)}%`;
+  document.querySelectorAll("[data-shirt-view]").forEach((button) => {
+    const view = button.dataset.shirtView;
+    button.textContent = t(view);
+    button.classList.toggle("active", view === activeShirtView);
+  });
+  setText("#zoomOutButton", "zoomOut");
+  setText("#zoomInButton", "zoomIn");
+  document.querySelector("#spinViewButton").textContent = t("view360");
+  document.querySelector("#spinViewButton").classList.toggle("active", Boolean(spinTimer));
+  document.querySelector("#sellingPrice").textContent = money(result.sellingPrice);
   document.querySelector("#vatNote").textContent = design.vatEnabled
-    ? `Includes 5% UAE VAT. Minimum premium shelf price is ${AED.format(MIN_SELLING_PRICE)}.`
-    : `VAT excluded. Minimum premium shelf price is ${AED.format(MIN_SELLING_PRICE)}.`;
-  document.querySelector("#totalCost").textContent = AED.format(result.productionCost);
-  document.querySelector("#unitCost").textContent = AED.format(result.unitCost);
-  document.querySelector("#grossProfit").textContent = AED.format(result.grossProfit);
-  document.querySelector("#actualMargin").textContent = `${Math.round(result.actualMargin)}%`;
+    ? t("taxIncludedNote", { price: money(MIN_SELLING_PRICE) })
+    : t("taxExcludedNote", { price: money(MIN_SELLING_PRICE) });
+  document.querySelector("#totalCost").textContent = money(result.productionCost);
+  document.querySelector("#unitCost").textContent = money(result.unitCost);
+  document.querySelector("#grossProfit").textContent = money(result.grossProfit);
+  document.querySelector("#actualMargin").textContent = percent(Math.round(result.actualMargin));
 
   renderBreakdown(result);
   renderBulkDiscounts();
@@ -542,7 +1391,9 @@ function updateUI() {
 function renderBulkDiscounts() {
   document.querySelector("#bulkDiscountRows").innerHTML = bulkDiscounts
     .map((tier, index) => {
-      const label = tier.maxQty >= 999999 ? `${tier.minQty}+ units` : `${tier.minQty}-${tier.maxQty} units`;
+      const label = tier.maxQty >= 999999
+        ? t("unitsPlus", { min: number(tier.minQty) })
+        : t("unitRange", { min: number(tier.minQty), max: number(tier.maxQty) });
       return `
         <label class="bulk-row">
           <span>${label}</span>
@@ -578,8 +1429,8 @@ function renderBreakdown(result) {
   document.querySelector("#breakdownRows").innerHTML = `
     <div class="pie-chart-wrap">
       <div class="pie-chart" style="--pie:${gradient}" role="img" aria-label="Cost mix pie chart">
-        <span>${AED.format(total)}</span>
-        <small>Total cost</small>
+        <span>${money(total)}</span>
+        <small>${t("totalCost")}</small>
       </div>
       <div class="pie-legend">
         ${slices
@@ -588,7 +1439,7 @@ function renderBreakdown(result) {
               <div class="pie-legend-row">
                 <span class="pie-key" style="background:${slice.color}"></span>
                 <span class="pie-label">${slice.label}</span>
-                <strong>${AED.format(slice.value)}</strong>
+                <strong>${money(slice.value)}</strong>
                 <small>${Math.round(slice.percent)}%</small>
               </div>
             `
@@ -610,15 +1461,17 @@ function renderLibrary() {
 
   libraryList.innerHTML = filtered.length
     ? filtered.map(renderLibraryItem).join("")
-    : `<div class="empty-state">No saved shirts match this filter.</div>`;
+    : `<div class="empty-state">${t("noSavedFilter")}</div>`;
 }
 
 function renderLibraryItem(design) {
   const result = calculate(design);
   const activeClass = design.id === activeId ? "active" : "";
   const color = methodPresets[design.method]?.color || "#2563eb";
-  const thumb = design.mockupImage
-    ? `<img class="mini-mockup" src="${design.mockupImage}" alt="" />`
+  const images = normalizeShirtImages(design);
+  const thumbnail = images.front || shirtViewKeys.map((key) => images[key]).find(Boolean);
+  const thumb = thumbnail
+    ? `<img class="mini-mockup" src="${thumbnail}" alt="" />`
     : `<span class="mini-shirt" style="--print-color:${color}"></span>`;
   return `
     <article class="library-item ${activeClass}" data-id="${design.id}">
@@ -626,14 +1479,14 @@ function renderLibraryItem(design) {
         ${thumb}
         <span>
           <strong>${design.designName}</strong>
-          <small>${design.method} &middot; ${design.ageGroup || "Adult"} &middot; ${design.gender || "Man"} &middot; ${design.quantity} pcs &middot; ${AED.format(result.sellingPrice)}</small>
+          <small>${design.method} &middot; ${displayAge(design.ageGroup)} &middot; ${displayGender(design.gender)} &middot; ${number(design.quantity)} ${t("pcs")} &middot; ${money(result.sellingPrice)}</small>
         </span>
       </button>
       <div class="library-actions">
-        <button type="button" title="Duplicate design" data-action="copy" data-id="${design.id}">
+        <button type="button" title="${t("duplicateDesign")}" data-action="copy" data-id="${design.id}">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M8 8h11v11H8z" /><path d="M5 16H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v1" /></svg>
         </button>
-        <button type="button" title="Delete design" data-action="delete" data-id="${design.id}">
+        <button type="button" title="${t("deleteDesign")}" data-action="delete" data-id="${design.id}">
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2m-9 0 1 15h8l1-15" /></svg>
         </button>
       </div>
@@ -651,19 +1504,19 @@ function renderCompareRows() {
           <strong>${normalized.designName}</strong>
           <span>${normalized.colorway}</span>
         </td>
-        <td>${normalized.method}<br /><span>${normalized.ageGroup} / ${normalized.gender}</span></td>
-        <td>${normalized.quantity}<br /><span>S ${normalized.sizeS} @ ${AED.format(buildSizeRow(normalized, "S").unitCost)} &middot; M ${normalized.sizeM} @ ${AED.format(buildSizeRow(normalized, "M").unitCost)} &middot; L ${normalized.sizeL} @ ${AED.format(buildSizeRow(normalized, "L").unitCost)}</span></td>
-        <td>${AED.format(result.unitCost)}</td>
-        <td>${result.bulkDiscount}%</td>
-        <td><strong>${AED.format(result.sellingPrice)}</strong></td>
-        <td>${Math.round(result.actualMargin)}%</td>
+        <td>${normalized.method}<br /><span>${displayAge(normalized.ageGroup)} / ${displayGender(normalized.gender)}</span></td>
+        <td>${number(normalized.quantity)}<br /><span>S ${number(normalized.sizeS)} @ ${money(buildSizeRow(normalized, "S").unitCost)} &middot; M ${number(normalized.sizeM)} @ ${money(buildSizeRow(normalized, "M").unitCost)} &middot; L ${number(normalized.sizeL)} @ ${money(buildSizeRow(normalized, "L").unitCost)}</span></td>
+        <td>${money(result.unitCost)}</td>
+        <td>${percent(result.bulkDiscount)}</td>
+        <td><strong>${money(result.sellingPrice)}</strong></td>
+        <td>${percent(Math.round(result.actualMargin))}</td>
       </tr>
     `;
   });
 
   document.querySelector("#compareRows").innerHTML = rows.length
     ? rows.join("")
-    : `<tr><td colspan="7">No saved designs yet.</td></tr>`;
+    : `<tr><td colspan="7">${t("noSavedDesigns")}</td></tr>`;
 }
 
 function updateView() {
@@ -684,6 +1537,7 @@ function escapeExcelCell(value) {
 function exportDesignsToExcel() {
   const currentDesign = getFormData();
   const exportRows = designs.map((design) => (design.id === currentDesign.id ? currentDesign : normalizeDesign(design)));
+  const currency = activeCurrency;
   const rows = exportRows.map((design) => {
     const result = calculate(design);
     return {
@@ -693,53 +1547,54 @@ function exportDesignsToExcel() {
       Age: design.ageGroup,
       "Printing Method": design.method,
       "Size S": design.sizeS,
-      "Size S Blank Cost AED": design.sizeSCost,
-      "Size S Print Cost AED": design.sizeSPrint,
-      "Size S Packaging AED": design.sizeSPackaging,
-      "Size S Label AED": design.sizeSLabel,
-      "Size S Labor AED": design.sizeSLabor,
-      "Size S Unit Cost AED": buildSizeRow(design, "S").unitCost.toFixed(2),
-      "Size S Total AED": buildSizeRow(design, "S").total.toFixed(2),
+      [`Size S Blank Cost ${currency}`]: design.sizeSCost,
+      [`Size S Print Cost ${currency}`]: design.sizeSPrint,
+      [`Size S Packaging ${currency}`]: design.sizeSPackaging,
+      [`Size S Label ${currency}`]: design.sizeSLabel,
+      [`Size S Labor ${currency}`]: design.sizeSLabor,
+      [`Size S Unit Cost ${currency}`]: buildSizeRow(design, "S").unitCost.toFixed(2),
+      [`Size S Total ${currency}`]: buildSizeRow(design, "S").total.toFixed(2),
       "Size M": design.sizeM,
-      "Size M Blank Cost AED": design.sizeMCost,
-      "Size M Print Cost AED": design.sizeMPrint,
-      "Size M Packaging AED": design.sizeMPackaging,
-      "Size M Label AED": design.sizeMLabel,
-      "Size M Labor AED": design.sizeMLabor,
-      "Size M Unit Cost AED": buildSizeRow(design, "M").unitCost.toFixed(2),
-      "Size M Total AED": buildSizeRow(design, "M").total.toFixed(2),
+      [`Size M Blank Cost ${currency}`]: design.sizeMCost,
+      [`Size M Print Cost ${currency}`]: design.sizeMPrint,
+      [`Size M Packaging ${currency}`]: design.sizeMPackaging,
+      [`Size M Label ${currency}`]: design.sizeMLabel,
+      [`Size M Labor ${currency}`]: design.sizeMLabor,
+      [`Size M Unit Cost ${currency}`]: buildSizeRow(design, "M").unitCost.toFixed(2),
+      [`Size M Total ${currency}`]: buildSizeRow(design, "M").total.toFixed(2),
       "Size L": design.sizeL,
-      "Size L Blank Cost AED": design.sizeLCost,
-      "Size L Print Cost AED": design.sizeLPrint,
-      "Size L Packaging AED": design.sizeLPackaging,
-      "Size L Label AED": design.sizeLLabel,
-      "Size L Labor AED": design.sizeLLabor,
-      "Size L Unit Cost AED": buildSizeRow(design, "L").unitCost.toFixed(2),
-      "Size L Total AED": buildSizeRow(design, "L").total.toFixed(2),
+      [`Size L Blank Cost ${currency}`]: design.sizeLCost,
+      [`Size L Print Cost ${currency}`]: design.sizeLPrint,
+      [`Size L Packaging ${currency}`]: design.sizeLPackaging,
+      [`Size L Label ${currency}`]: design.sizeLLabel,
+      [`Size L Labor ${currency}`]: design.sizeLLabor,
+      [`Size L Unit Cost ${currency}`]: buildSizeRow(design, "L").unitCost.toFixed(2),
+      [`Size L Total ${currency}`]: buildSizeRow(design, "L").total.toFixed(2),
       "Total Quantity": design.quantity,
-      "Average Blank Shirt Cost AED": design.blankCost.toFixed(2),
-      "Size Production Total AED": result.sizeProductionTotal.toFixed(2),
-      "Print Cost Per Shirt AED": design.printCost,
-      "Setup Fee AED": design.setupFee,
-      "Packaging Per Shirt AED": design.packaging,
-      "Label / Tag Per Shirt AED": design.labelCost,
-      "Labor Per Shirt AED": design.laborCost,
-      "License / Trade Permit AED": design.overheadLicense,
-      "Design Permit / Archive Rights AED": design.overheadDesignPermit,
-      "Label Tags Batch AED": design.overheadLabelsTags,
-      "Delivery Charges AED": design.overheadDelivery,
-      "Other Overhead AED": design.overheadOther,
-      "Overhead Total AED": result.overheadTotal.toFixed(2),
-      "Overhead Per Shirt AED": result.overheadPerShirt.toFixed(2),
-      "Total Production Cost AED": result.productionCost.toFixed(2),
-      "Cost Per Shirt AED": result.unitCost.toFixed(2),
+      [`Average Blank Shirt Cost ${currency}`]: design.blankCost.toFixed(2),
+      [`Size Production Total ${currency}`]: result.sizeProductionTotal.toFixed(2),
+      [`Print Cost Per Shirt ${currency}`]: design.printCost,
+      [`Setup Fee ${currency}`]: design.setupFee,
+      [`Packaging Per Shirt ${currency}`]: design.packaging,
+      [`Label / Tag Per Shirt ${currency}`]: design.labelCost,
+      [`Labor Per Shirt ${currency}`]: design.laborCost,
+      [`License / Trade Permit ${currency}`]: design.overheadLicense,
+      [`Design Permit / Archive Rights ${currency}`]: design.overheadDesignPermit,
+      [`Label Tags Batch ${currency}`]: design.overheadLabelsTags,
+      [`Delivery Charges ${currency}`]: design.overheadDelivery,
+      [`Other Overhead ${currency}`]: design.overheadOther,
+      "Other Overhead Details": design.overheadOtherDetails || "",
+      [`Overhead Total ${currency}`]: result.overheadTotal.toFixed(2),
+      [`Overhead Per Shirt ${currency}`]: result.overheadPerShirt.toFixed(2),
+      [`Total Production Cost ${currency}`]: result.productionCost.toFixed(2),
+      [`Cost Per Shirt ${currency}`]: result.unitCost.toFixed(2),
       "Bulk Discount %": result.bulkDiscount,
-      "Discounted Cost Per Shirt AED": result.discountedUnitCost.toFixed(2),
+      [`Discounted Cost Per Shirt ${currency}`]: result.discountedUnitCost.toFixed(2),
       "Desired Margin %": design.margin,
       "Actual Margin %": result.actualMargin.toFixed(2),
-      "VAT Included": design.vatEnabled ? "Yes" : "No",
-      "Suggested Selling Price AED": result.sellingPrice.toFixed(2),
-      "Gross Profit Per Shirt AED": result.grossProfit.toFixed(2)
+      "Tax Included": design.vatEnabled ? "Yes" : "No",
+      [`Suggested Selling Price ${currency}`]: result.sellingPrice.toFixed(2),
+      [`Gross Profit Per Shirt ${currency}`]: result.grossProfit.toFixed(2)
     };
   });
 
@@ -759,12 +1614,12 @@ function exportDesignsToExcel() {
   const stamp = new Date().toISOString().slice(0, 10);
   const url = URL.createObjectURL(blob);
   link.href = url;
-  link.download = `ArchiveThread-UAE-shirt-pricing-${stamp}.xls`;
+  link.download = t("excelFileName", { stamp });
   document.body.append(link);
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-  showToast("Excel file exported.");
+  showToast(t("excelExported"));
 }
 
 function exportCurrentDesignToPdf() {
@@ -776,7 +1631,7 @@ function exportCurrentDesignToPdf() {
     buildSizeRow(design, "L")
   ];
   const breakdownRows = result.breakdown
-    .map(([label, value]) => `<tr><td>${escapeExcelCell(label)}</td><td>${AED.format(value)}</td></tr>`)
+    .map(([label, value]) => `<tr><td>${escapeExcelCell(label)}</td><td>${money(value)}</td></tr>`)
     .join("");
   const html = `
     <!doctype html>
@@ -806,43 +1661,43 @@ function exportCurrentDesignToPdf() {
         <div class="brand">
           <div class="mark">AT</div>
           <div>
-            <h1>ArchiveThread UAE</h1>
-            <div>Premium Souvenir T-Shirt Quote</div>
+            <h1>${t("brandName")}</h1>
+            <div>${t("quoteTitle")}</div>
           </div>
         </div>
 
         <div class="grid">
-          <div class="box"><div class="label">Design</div><div class="value">${escapeExcelCell(design.designName)}</div></div>
-          <div class="box"><div class="label">Colorway</div><div class="value">${escapeExcelCell(design.colorway)}</div></div>
-          <div class="box"><div class="label">Printing</div><div class="value">${design.method}</div></div>
-          <div class="box"><div class="label">Specs</div><div class="value">${design.ageGroup} / ${design.gender}</div></div>
+          <div class="box"><div class="label">${t("design")}</div><div class="value">${escapeExcelCell(design.designName)}</div></div>
+          <div class="box"><div class="label">${t("colorway")}</div><div class="value">${escapeExcelCell(design.colorway)}</div></div>
+          <div class="box"><div class="label">${t("printingMethod")}</div><div class="value">${design.method}</div></div>
+          <div class="box"><div class="label">${t("specs")}</div><div class="value">${displayAge(design.ageGroup)} / ${displayGender(design.gender)}</div></div>
         </div>
 
-        <h2>Size Breakdown</h2>
+        <h2>${t("sizeBreakdown")}</h2>
         <table>
-          <thead><tr><th>Size</th><th>Qty</th><th>Blank</th><th>Print</th><th>Pkg</th><th>Label</th><th>Labor</th><th>Total</th></tr></thead>
-          <tbody>${sizeRows.map((row) => `<tr><td>${row.size}</td><td>${row.quantity}</td><td>${AED.format(row.blank)}</td><td>${AED.format(row.print)}</td><td>${AED.format(row.packaging)}</td><td>${AED.format(row.label)}</td><td>${AED.format(row.labor)}</td><td>${AED.format(row.total)}</td></tr>`).join("")}<tr><th>Total</th><th>${design.quantity}</th><th colspan="5">Average cost ${AED.format(result.unitCost)} including shared costs</th><th>${AED.format(result.sizeProductionTotal)}</th></tr></tbody>
+          <thead><tr><th>${t("size")}</th><th>${t("qty")}</th><th>${t("blank")}</th><th>${t("print")}</th><th>${t("packaging")}</th><th>${t("label")}</th><th>${t("labor")}</th><th>${t("total")}</th></tr></thead>
+          <tbody>${sizeRows.map((row) => `<tr><td>${row.size}</td><td>${number(row.quantity)}</td><td>${money(row.blank)}</td><td>${money(row.print)}</td><td>${money(row.packaging)}</td><td>${money(row.label)}</td><td>${money(row.labor)}</td><td>${money(row.total)}</td></tr>`).join("")}<tr><th>${t("total")}</th><th>${number(design.quantity)}</th><th colspan="5">${t("averageCostIncluding", { cost: money(result.unitCost) })}</th><th>${money(result.sizeProductionTotal)}</th></tr></tbody>
         </table>
 
-        <h2>Cost Breakdown</h2>
+        <h2>${t("costBreakdown")}</h2>
         <table>
-          <thead><tr><th>Item</th><th>Total AED</th></tr></thead>
-          <tbody>${breakdownRows}<tr><th>Total production cost</th><th>${AED.format(result.productionCost)}</th></tr></tbody>
+          <thead><tr><th>${t("item")}</th><th>${t("total")} ${activeCurrency}</th></tr></thead>
+          <tbody>${breakdownRows}<tr><th>${t("totalProductionCost")}</th><th>${money(result.productionCost)}</th></tr></tbody>
         </table>
 
         <div class="summary">
-          <div>Suggested selling price</div>
-          <strong>${AED.format(result.sellingPrice)}</strong>
-          <p>Cost per shirt: ${AED.format(result.unitCost)} &middot; Bulk discount: ${result.bulkDiscount}% &middot; Gross profit per shirt: ${AED.format(result.grossProfit)} &middot; Margin: ${Math.round(result.actualMargin)}%</p>
+          <div>${t("suggestedSellingPrice")}</div>
+          <strong>${money(result.sellingPrice)}</strong>
+          <p>${t("quoteSummary", { cost: money(result.unitCost), discount: percent(result.bulkDiscount), profit: money(result.grossProfit), margin: percent(Math.round(result.actualMargin)) })}</p>
         </div>
 
-        <div class="footer">Generated ${new Date().toLocaleString()} for ArchiveThread UAE.</div>
+        <div class="footer">${t("generated", { date: localizedDate() })}</div>
       </body>
     </html>
   `;
   const printWindow = window.open("", "", "width=1000,height=800");
   if (!printWindow) {
-    showToast("Allow popups to export PDF.");
+    showToast(t("allowPopups"));
     return;
   }
   printWindow.document.write(html);
@@ -862,7 +1717,7 @@ function saveCurrentDesign() {
   }
   persistDesigns();
   updateUI();
-  showToast("Design saved to library.");
+  showToast(t("designSaved"));
 }
 
 function duplicateDesign(source = getFormData()) {
@@ -874,18 +1729,18 @@ function duplicateDesign(source = getFormData()) {
   designs.unshift(copy);
   persistDesigns();
   setFormData(copy);
-  showToast("Design duplicated.");
+  showToast(t("designDuplicated"));
 }
 
 function deleteDesign(id) {
   designs = designs.filter((design) => design.id !== id);
   if (!designs.length) {
-    const fresh = { ...seedDesigns[0], id: crypto.randomUUID(), designName: "New UAE Souvenir Tee" };
+    const fresh = { ...seedDesigns[0], id: crypto.randomUUID(), designName: t("untitled") };
     designs = [fresh];
   }
   persistDesigns();
   setFormData(designs[0]);
-  showToast("Design deleted.");
+  showToast(t("designDeleted"));
 }
 
 function showToast(message) {
@@ -908,7 +1763,7 @@ document.querySelector("#applyPresetButton").addEventListener("click", () => {
   });
   document.querySelector("#setupFee").value = preset.setupFee;
   updateUI();
-  showToast("Printing preset applied.");
+  showToast(t("presetApplied"));
 });
 
 document.querySelectorAll("[data-method-option]").forEach((button) => {
@@ -920,7 +1775,7 @@ document.querySelectorAll("[data-method-option]").forEach((button) => {
 
 document.querySelector("#newDesignButton").addEventListener("click", () => {
   activeId = null;
-  setFormData({ ...seedDesigns[0], id: crypto.randomUUID(), designName: "New UAE Souvenir Tee" });
+  setFormData({ ...seedDesigns[0], id: crypto.randomUUID(), designName: t("untitled") });
   activeId = null;
   updateUI();
 });
@@ -929,6 +1784,18 @@ document.querySelector("#duplicateButton").addEventListener("click", () => dupli
 
 document.querySelector("#exportExcelButton").addEventListener("click", exportDesignsToExcel);
 document.querySelector("#exportPdfButton").addEventListener("click", exportCurrentDesignToPdf);
+document.querySelector("#languageSelect").addEventListener("change", (event) => {
+  activeLanguage = languageOptions[event.target.value] ? event.target.value : "en";
+  persistLanguage();
+  updateUI();
+  showToast(t("languageChanged", { language: languageOptions[activeLanguage].label }));
+});
+document.querySelector("#currencySelect").addEventListener("change", (event) => {
+  activeCurrency = currencyOptions[event.target.value] ? event.target.value : "AED";
+  persistCurrency();
+  updateUI();
+  showToast(t("currencyChanged", { currency: activeCurrency }));
+});
 
 document.querySelector("#singleViewButton").addEventListener("click", () => {
   activeView = "single";
@@ -950,17 +1817,71 @@ document.querySelector("#bulkDiscountRows").addEventListener("input", (event) =>
   updateUI();
 });
 
-document.querySelector("#mockupUpload").addEventListener("change", (event) => {
-  const file = event.target.files?.[0];
-  if (!file) return;
+document.querySelectorAll("[data-photo-upload]").forEach((input) => {
+  input.addEventListener("change", (event) => {
+    const view = event.target.dataset.photoUpload;
+    const file = event.target.files?.[0];
+    if (!file || !shirtViewKeys.includes(view)) return;
 
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    currentMockupImage = String(reader.result || "");
-    updateUI();
-    showToast("Mockup layout uploaded.");
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      currentShirtImages[view] = String(reader.result || "");
+      currentMockupImage = currentShirtImages.front || currentMockupImage;
+      activeShirtView = view;
+      viewerZoom = 1;
+      stopSpin();
+      updateUI();
+      showToast(t("mockupUploaded"));
+    });
+    reader.readAsDataURL(file);
   });
-  reader.readAsDataURL(file);
+});
+
+document.querySelectorAll("[data-shirt-view]").forEach((button) => {
+  button.addEventListener("click", () => {
+    activeShirtView = button.dataset.shirtView;
+    viewerZoom = 1;
+    stopSpin();
+    updateUI();
+  });
+});
+
+document.querySelector("#zoomInButton").addEventListener("click", () => {
+  viewerZoom = Math.min(4, viewerZoom + 0.25);
+  updateUI();
+});
+
+document.querySelector("#zoomOutButton").addEventListener("click", () => {
+  viewerZoom = Math.max(1, viewerZoom - 0.25);
+  updateUI();
+});
+
+document.querySelector("#resetZoomButton").addEventListener("click", () => {
+  viewerZoom = 1;
+  updateUI();
+});
+
+document.querySelector("#spinViewButton").addEventListener("click", () => {
+  if (spinTimer) {
+    stopSpin();
+    updateUI();
+    return;
+  }
+
+  const availableViews = shirtViewKeys.filter((view) => currentShirtImages[view]);
+  if (availableViews.length < 2) {
+    showToast(t("shirtPhotosDescription"));
+    return;
+  }
+
+  let index = Math.max(0, availableViews.indexOf(activeShirtView));
+  spinTimer = window.setInterval(() => {
+    index = (index + 1) % availableViews.length;
+    activeShirtView = availableViews[index];
+    viewerZoom = 1;
+    updateUI();
+  }, 900);
+  updateUI();
 });
 
 libraryList.addEventListener("click", (event) => {

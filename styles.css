@@ -405,6 +405,37 @@ input[readonly] {
   justify-content: flex-end;
 }
 
+.toolbar-control {
+  display: grid;
+  grid-template-columns: auto minmax(92px, 110px);
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0 10px;
+  border: 1px solid rgba(25, 25, 35, 0.1);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.toolbar-control span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.toolbar-control select {
+  min-height: 32px;
+  padding: 5px 8px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.language-control {
+  grid-template-columns: auto minmax(116px, 150px);
+}
+
 .view-toggle {
   display: inline-flex;
   gap: 4px;
@@ -516,61 +547,41 @@ input[readonly] {
 
 .preview-band {
   display: grid;
-  grid-template-columns: 112px repeat(3, minmax(140px, 1fr));
+  grid-template-columns: minmax(280px, 360px) minmax(220px, 0.7fr) minmax(260px, 1fr);
   gap: 16px;
-  align-items: end;
+  align-items: stretch;
+}
+
+.shirt-viewer,
+.design-fields,
+.photo-upload-panel {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
 }
 
 .shirt-preview {
   position: relative;
-  width: 100px;
-  height: 124px;
-  justify-self: center;
+  width: 100%;
+  min-height: 360px;
   overflow: hidden;
   border: 1px solid rgba(25, 25, 35, 0.14);
   border-radius: var(--radius);
-  background: var(--shadow-grey);
+  background:
+    linear-gradient(45deg, rgba(255, 255, 255, 0.08) 25%, transparent 25% 75%, rgba(255, 255, 255, 0.08) 75%),
+    var(--shadow-grey);
+  background-size: 20px 20px;
   box-shadow: 0 18px 34px rgba(25, 25, 35, 0.2);
-}
-
-.shirt-preview::before,
-.shirt-preview::after {
-  content: "";
-  position: absolute;
-  top: 18px;
-  width: 24px;
-  height: 38px;
-  background: var(--shadow-grey);
-}
-
-.shirt-preview::before {
-  left: -12px;
-  transform: rotate(18deg);
-}
-
-.shirt-preview::after {
-  right: -12px;
-  transform: rotate(-18deg);
-}
-
-.collar {
-  position: absolute;
-  top: 0;
-  left: 35px;
-  width: 30px;
-  height: 15px;
-  border-radius: 0 0 16px 16px;
-  background: rgba(246, 244, 243, 0.16);
 }
 
 .archive-print {
   position: absolute;
   left: 50%;
-  top: 48px;
-  width: 56px;
+  top: 50%;
+  width: 120px;
   transform: translateX(-50%);
   color: #fff;
-  font-size: 10px;
+  font-size: 20px;
   font-weight: 900;
   line-height: 1.1;
   text-align: center;
@@ -582,11 +593,80 @@ input[readonly] {
   z-index: 2;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  transform: scale(var(--zoom, 1));
+  transform-origin: center;
+  transition: transform 0.2s ease;
 }
 
 .shirt-preview img:not([hidden]) + .archive-print {
   display: none;
+}
+
+.viewer-controls,
+.zoom-controls,
+.view-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.viewer-controls {
+  flex-direction: column;
+}
+
+.view-tabs {
+  flex-wrap: wrap;
+}
+
+.view-tabs button,
+.zoom-controls button {
+  min-height: 34px;
+  border: 1px solid rgba(25, 25, 35, 0.1);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--ink);
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.view-tabs button.active,
+.zoom-controls button.active {
+  background: var(--cornflower);
+  color: #fff;
+}
+
+.photo-upload-panel h3,
+.photo-upload-panel p {
+  margin: 0;
+}
+
+.photo-upload-panel h3 {
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.photo-upload-panel p {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.photo-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.photo-upload-grid label {
+  margin: 0;
+}
+
+.photo-upload-grid input {
+  margin-top: 7px;
+  min-height: 36px;
+  padding: 6px;
 }
 
 label {
@@ -744,6 +824,10 @@ label {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 12px;
+}
+
+.wide-field {
+  grid-column: 1 / -1;
 }
 
 .bulk-grid {
@@ -1280,8 +1364,14 @@ output {
 
   .primary-button,
   .secondary-button,
-  .ghost-button {
+  .ghost-button,
+  .toolbar-control {
     width: 100%;
+  }
+
+  .toolbar-control {
+    grid-template-columns: 1fr;
+    padding: 10px;
   }
 
   .summary-panel {

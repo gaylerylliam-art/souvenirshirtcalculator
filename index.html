@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ArchiveThread UAE | Souvenir T-Shirt Calculator</title>
+    <title>ArchiveThread Worldwide | Archive Souvenir Shirt Calculator</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -12,7 +12,7 @@
         <div class="brand-lockup">
           <div class="brand-mark" aria-hidden="true">AT</div>
           <div>
-            <p class="brand-name">ArchiveThread UAE</p>
+            <p class="brand-name">ArchiveThread Worldwide</p>
             <p class="brand-subtitle">Premium souvenir pricing</p>
           </div>
         </div>
@@ -38,9 +38,33 @@
         <header class="topbar">
           <div>
             <h1>T-shirt cost and selling price calculator</h1>
-            <p>Estimate AED costs for premium UAE archive-quality DTF, DTG, and Silk Screen production.</p>
+            <p>Estimate costs for archive-quality souvenir shirt production anywhere in the world.</p>
           </div>
           <div class="topbar-actions">
+            <label class="toolbar-control language-control" for="languageSelect">
+              <span>Language</span>
+              <select id="languageSelect" name="languageSelect">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="ar">العربية</option>
+                <option value="hi">हिन्दी</option>
+                <option value="zh">中文</option>
+                <option value="fil">Filipino</option>
+              </select>
+            </label>
+            <label class="toolbar-control currency-control" for="currencySelect">
+              <span>Currency</span>
+              <select id="currencySelect" name="currencySelect">
+                <option value="AED">AED</option>
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="PHP">PHP</option>
+                <option value="INR">INR</option>
+                <option value="SAR">SAR</option>
+              </select>
+            </label>
             <button class="ghost-button" id="exportPdfButton" type="button">
               <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z" /><path d="M14 2v6h6" /><path d="M9 14h6M9 18h4" /></svg>
               Export PDF
@@ -72,22 +96,49 @@
             </div>
 
             <div class="preview-band">
-              <div class="shirt-preview" id="shirtPreview">
-                <div class="collar"></div>
-                <img id="mockupPreview" alt="" />
-                <div class="archive-print">UAE<br />ARCHIVE</div>
+              <div class="shirt-viewer">
+                <div class="shirt-preview" id="shirtPreview">
+                  <img id="mockupPreview" alt="" />
+                  <div class="archive-print">GLOBAL<br />ARCHIVE</div>
+                </div>
+                <div class="viewer-controls">
+                  <div class="view-tabs" aria-label="Shirt photo views">
+                    <button class="active" type="button" data-shirt-view="front">Front</button>
+                    <button type="button" data-shirt-view="back">Back</button>
+                    <button type="button" data-shirt-view="left">Left</button>
+                    <button type="button" data-shirt-view="right">Right</button>
+                    <button type="button" data-shirt-view="detail">Detail</button>
+                  </div>
+                  <div class="zoom-controls" aria-label="Photo zoom controls">
+                    <button type="button" id="zoomOutButton">-</button>
+                    <button type="button" id="resetZoomButton">100%</button>
+                    <button type="button" id="zoomInButton">+</button>
+                    <button type="button" id="spinViewButton">360</button>
+                  </div>
+                </div>
               </div>
-              <div>
-                <label for="designName">Design name</label>
-                <input id="designName" name="designName" type="text" value="Dubai Creek Heritage Tee" />
+              <div class="design-fields">
+                <div>
+                  <label for="designName">Design name</label>
+                  <input id="designName" name="designName" type="text" value="Dubai Creek Heritage Tee" />
+                </div>
+                <div>
+                  <label for="colorway">Colorway</label>
+                  <input id="colorway" name="colorway" type="text" value="Sand / Deep Green" />
+                </div>
               </div>
-              <div>
-                <label for="colorway">Colorway</label>
-                <input id="colorway" name="colorway" type="text" value="Sand / Deep Green" />
-              </div>
-              <div class="mockup-upload">
-                <label for="mockupUpload">Mockup layout</label>
-                <input id="mockupUpload" name="mockupUpload" type="file" accept="image/*" />
+              <div class="photo-upload-panel">
+                <div>
+                  <h3>Shirt photos</h3>
+                  <p>Upload up to five views for product inspection.</p>
+                </div>
+                <div class="photo-upload-grid">
+                  <label for="frontUpload">Front<input id="frontUpload" data-photo-upload="front" type="file" accept="image/*" /></label>
+                  <label for="backUpload">Back<input id="backUpload" data-photo-upload="back" type="file" accept="image/*" /></label>
+                  <label for="leftUpload">Left side<input id="leftUpload" data-photo-upload="left" type="file" accept="image/*" /></label>
+                  <label for="rightUpload">Right side<input id="rightUpload" data-photo-upload="right" type="file" accept="image/*" /></label>
+                  <label for="detailUpload">Detail<input id="detailUpload" data-photo-upload="detail" type="file" accept="image/*" /></label>
+                </div>
               </div>
             </div>
 
@@ -166,11 +217,11 @@
                   <h3>Size quantities and blank costs</h3>
                   <p>Set different quantities and shirt blank prices for each required size.</p>
                 </div>
-                <strong id="blankTotal">AED 0.00 total</strong>
+                <strong id="blankTotal">0.00 total</strong>
               </div>
               <div class="size-card-grid">
                 <article class="size-cost-card">
-                  <header><strong>Size S</strong><output id="sizeSTotal">AED 0.00</output></header>
+                  <header><strong>Size S</strong><output id="sizeSTotal">0.00</output></header>
                   <div class="mini-grid">
                     <label>Qty<input id="sizeS" name="sizeS" type="number" min="0" value="15" /></label>
                     <label>Blank<input id="sizeSCost" name="sizeSCost" type="number" min="0" step="0.01" value="18" /></label>
@@ -181,7 +232,7 @@
                   </div>
                 </article>
                 <article class="size-cost-card">
-                  <header><strong>Size M</strong><output id="sizeMTotal">AED 0.00</output></header>
+                  <header><strong>Size M</strong><output id="sizeMTotal">0.00</output></header>
                   <div class="mini-grid">
                     <label>Qty<input id="sizeM" name="sizeM" type="number" min="0" value="20" /></label>
                     <label>Blank<input id="sizeMCost" name="sizeMCost" type="number" min="0" step="0.01" value="22" /></label>
@@ -192,7 +243,7 @@
                   </div>
                 </article>
                 <article class="size-cost-card">
-                  <header><strong>Size L</strong><output id="sizeLTotal">AED 0.00</output></header>
+                  <header><strong>Size L</strong><output id="sizeLTotal">0.00</output></header>
                   <div class="mini-grid">
                     <label>Qty<input id="sizeL" name="sizeL" type="number" min="0" value="15" /></label>
                     <label>Blank<input id="sizeLCost" name="sizeLCost" type="number" min="0" step="0.01" value="25" /></label>
@@ -211,7 +262,7 @@
                   <h3>Overhead cost breakdown</h3>
                   <p>Enter batch costs once; the app divides them across S, M, and L quantities.</p>
                 </div>
-                <strong id="overheadTotal">AED 0.00 total</strong>
+                <strong id="overheadTotal">0.00 total</strong>
               </div>
               <div class="form-grid overhead-grid">
                 <div>
@@ -234,6 +285,10 @@
                   <label for="overheadOther">Other overhead</label>
                   <input id="overheadOther" name="overheadOther" type="number" min="0" step="0.01" value="20" />
                 </div>
+                <div class="wide-field">
+                  <label for="overheadOtherDetails">Other overhead details</label>
+                  <input id="overheadOtherDetails" name="overheadOtherDetails" type="text" value="Special handling and storage" />
+                </div>
               </div>
             </div>
 
@@ -241,7 +296,7 @@
               <div class="section-heading compact-heading">
                 <div>
                   <h3>Bulk pricing discounts</h3>
-                  <p>Discounts are applied to cost per shirt before margin and VAT.</p>
+                  <p>Discounts are applied to cost per shirt before margin and tax.</p>
                 </div>
                 <strong id="activeBulkDiscount">0% active</strong>
               </div>
@@ -252,7 +307,7 @@
               <label class="toggle">
                 <input id="vatEnabled" name="vatEnabled" type="checkbox" checked />
                 <span></span>
-                Add UAE VAT 5% to shelf price
+                Add VAT / sales tax 5% to shelf price
               </label>
               <button class="text-button" id="applyPresetButton" type="button">Apply method preset</button>
             </div>
@@ -273,14 +328,14 @@
             <div class="section-heading">
               <div>
                 <h2>Price recommendation</h2>
-                <p>All figures are calculated in AED.</p>
+                <p id="currencyNote">All figures use AED.</p>
               </div>
             </div>
 
             <div class="hero-metric">
               <span>Suggested selling price</span>
-              <strong id="sellingPrice">AED 0.00</strong>
-              <p id="vatNote">Includes 5% UAE VAT shelf price.</p>
+              <strong id="sellingPrice">0.00</strong>
+              <p id="vatNote">Includes 5% VAT / sales tax shelf price.</p>
             </div>
 
             <div class="metric-grid">
@@ -290,15 +345,15 @@
               </div>
               <div>
                 <span>Total production cost</span>
-                <strong id="totalCost">AED 0.00</strong>
+                <strong id="totalCost">0.00</strong>
               </div>
               <div>
                 <span>Cost per shirt</span>
-                <strong id="unitCost">AED 0.00</strong>
+                <strong id="unitCost">0.00</strong>
               </div>
               <div>
                 <span>Gross profit / shirt</span>
-                <strong id="grossProfit">AED 0.00</strong>
+                <strong id="grossProfit">0.00</strong>
               </div>
               <div>
                 <span>Margin</span>
