@@ -106,8 +106,8 @@ const translations = {
     priceRecommendation: "Price recommendation",
     allFiguresUse: "All figures use {currency} ({currencyName}).",
     suggestedSellingPrice: "Suggested selling price",
-    taxIncludedNote: "Includes 5% VAT / sales tax. Minimum premium shelf price is {price}.",
-    taxExcludedNote: "VAT / sales tax excluded. Minimum premium shelf price is {price}.",
+    taxIncludedNote: "Includes 5% VAT / sales tax. Desired margin is applied to the shelf price.",
+    taxExcludedNote: "VAT / sales tax excluded. Desired margin is applied to the shelf price.",
     bulkDiscount: "Bulk discount",
     totalProductionCost: "Total production cost",
     costPerShirt: "Cost per shirt",
@@ -663,8 +663,8 @@ translations.ru = {
   priceRecommendation: "Рекомендация цены",
   allFiguresUse: "Все суммы указаны в {currency} ({currencyName}).",
   suggestedSellingPrice: "Рекомендуемая цена",
-  taxIncludedNote: "Включает 5% НДС / налог с продаж. Минимальная премиальная цена: {price}.",
-  taxExcludedNote: "НДС / налог с продаж не включен. Минимальная премиальная цена: {price}.",
+  taxIncludedNote: "Включает 5% НДС / налог с продаж. Желаемая маржа применяется к цене.",
+  taxExcludedNote: "НДС / налог с продаж не включен. Желаемая маржа применяется к цене.",
   bulkDiscount: "Скидка за объем",
   totalProductionCost: "Общая стоимость производства",
   costPerShirt: "Себестоимость за футболку",
@@ -720,7 +720,6 @@ const methodPresets = {
   "Silk Screen": { printCost: 35, setupFee: 220, color: "#0f172a" }
 };
 
-const MIN_SELLING_PRICE = 250;
 const shirtViewKeys = ["front", "back", "left", "right", "detail"];
 const defaultBulkDiscounts = [
   { minQty: 1, maxQty: 24, discountPercent: 0 },
@@ -1334,7 +1333,7 @@ function calculate(design) {
   const targetMargin = Math.min(designNumber(design, "margin"), 95) / 100;
   const preVatPrice = discountedUnitCost / (1 - targetMargin);
   const calculatedShelfPrice = design.vatEnabled ? preVatPrice * 1.05 : preVatPrice;
-  const sellingPrice = Math.max(MIN_SELLING_PRICE, calculatedShelfPrice);
+  const sellingPrice = calculatedShelfPrice;
   const revenueExVat = design.vatEnabled ? sellingPrice / 1.05 : sellingPrice;
   const grossProfit = revenueExVat - discountedUnitCost;
   const actualMargin = revenueExVat ? (grossProfit / revenueExVat) * 100 : 0;
@@ -1503,8 +1502,8 @@ function updateUI() {
   document.querySelector("#spinViewButton").classList.toggle("active", Boolean(spinTimer));
   document.querySelector("#sellingPrice").textContent = money(result.sellingPrice);
   document.querySelector("#vatNote").textContent = design.vatEnabled
-    ? t("taxIncludedNote", { price: money(MIN_SELLING_PRICE) })
-    : t("taxExcludedNote", { price: money(MIN_SELLING_PRICE) });
+    ? t("taxIncludedNote")
+    : t("taxExcludedNote");
   document.querySelector("#totalCost").textContent = money(result.productionCost);
   document.querySelector("#unitCost").textContent = money(result.unitCost);
   document.querySelector("#grossProfit").textContent = money(result.grossProfit);
